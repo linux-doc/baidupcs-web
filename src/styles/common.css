@@ -1,0 +1,21 @@
+.header {
+    background-image: url("../images/login-bg.jpg");
+    position: absolute;
+}
+
+html, body, #app, .layout, .ivu-layout {
+    height: 100%;
+}
+
+.ivu-tree ul {
+    font-size: 14px !important;
+}
+
+.ivu-layout-content {
+    flex: 1 !important;
+}
+
+.icons {
+    height: calc(100% - 90px);
+    zoom: 1;
+}
