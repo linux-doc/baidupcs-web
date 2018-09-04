@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <Sider hide-trigger :style="{background: '#fff'}">
-            <Menu theme="light" width="auto" :open-names="['1']" active-name="select_menu_name"
+            <Menu theme="light" width="auto" :open-names="['1']" :active-name="select_menu_name"
                   @on-select="getMenuName">
                 <Submenu name="1">
                     <template slot="title">
@@ -75,16 +75,16 @@
                     {{item.total_size}}
                 </p>
                 <Row>
-                    <Col span="12">
+                    <Col span="8">
                         <Progress :percent="item.percent" status="active"/>
                     </Col>
-                    <Col span="10" offset="2">
+                    <Col span="16">
                         <p>
-                            已经下载: {{item.download_size}}
-                            <Divider type="vertical"/>
                             平均速度: {{item.avg_speed}}/s
                             <Divider type="vertical"/>
                             已用时间: {{item.time_used}}
+                            <Divider type="vertical"/>
+                            保存路径: {{item.save_path}}
                         </p>
                     </Col>
                 </Row>
@@ -119,24 +119,20 @@
                 downloaded: []
             }
         },
-        props: ['pending_download_data'],
+        props: ['global_data'],
         watch: {
-            pending_download_data: {
-                handler(cur_val) {
-                    if (cur_val.length === 0)
-                        return;
-
-                    // console.log(cur_val);
-                    for (let i = 0; i < cur_val.length; i++) {
-                        if (this.indexPendingDownloadList(cur_val[i]) !== -1) {
-                            console.log("hahah");
+            'global_data.send_download_signal'(cur_val) {
+                if (cur_val === true) {
+                    let pending = this.global_data.pending_download_data;
+                    for (let i = 0; i < pending.length; i++) {
+                        if (this.indexPendingDownloadList(pending[i]) !== -1) {
                             continue;
                         }
 
-                        let fd_names = cur_val[i].split("/");
+                        let fd_names = pending[i].split("/");
                         this.pending_download.push({
                             lastID: 0,
-                            path: cur_val[i],
+                            path: pending[i],
                             name: fd_names[fd_names.length - 1],
                             speed: "0KB",
                             time_used: "0s",
@@ -150,13 +146,33 @@
 
                     var send_json = {
                         "type": 2,
-                        "paths": this.pending_download_data
+                        "paths": this.global_data.pending_download_data
                     };
                     this.websocket.send(JSON.stringify(send_json));
 
-                    while (this.pending_download_data.length > 0) {
-                        this.pending_download_data.pop()
+                    while (pending.length > 0) {
+                        pending.pop()
                     }
+                    this.global_data.send_download_signal = false;
+                }
+            },
+            'global_data.send_upload_signal'(cur_val) {
+                if (cur_val === 2) {
+                    let pending = this.global_data.pending_upload_data;
+                    console.log(pending);
+                    let tpath = pending.shift();
+                    var send_json = {
+                        "type": 3,
+                        "paths": pending,
+                        "tpath": tpath
+                    };
+                    console.log(send_json);
+                    this.websocket.send(JSON.stringify(send_json));
+
+                    while (pending.length > 0) {
+                        pending.pop()
+                    }
+                    this.global_data.send_upload_signal = 0;
                 }
             }
         },
@@ -248,6 +264,7 @@
                                     time_left: "0s",
                                     percent: 100,
                                     status: redata.status,
+                                    save_path: data.savePath,
                                 });
                                 this.downloading.splice(i, 1);
                             }
