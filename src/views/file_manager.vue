@@ -35,9 +35,22 @@
                                 @click.prevent.native="handleCheckAll">全选
                         </Checkbox>
                         <Button @click="changeViewMode" type="text">
-                            <Icon type="md-list" size="24" v-if="files_view_mode === 1"></Icon>
+                            <Icon type="md-reorder" size="24" v-if="files_view_mode === 1"></Icon>
                             <Icon type="md-apps" size="24" v-if="files_view_mode === 2"></Icon>
                         </Button>
+                        <Dropdown @on-click="fileSort">
+                            <a href="javascript:void(0)">
+                                <Icon type="md-swap" size="24"></Icon>
+                            </a>
+                            <DropdownMenu slot="list">
+                                <DropdownItem name="name-asc">名称 - 升序</DropdownItem>
+                                <DropdownItem name="name-desc">名称 - 降序</DropdownItem>
+                                <DropdownItem name="size-asc">大小 - 升序</DropdownItem>
+                                <DropdownItem name="size-desc">大小 - 降序</DropdownItem>
+                                <DropdownItem name="time-asc">时间 - 升序</DropdownItem>
+                                <DropdownItem name="time-desc">时间 - 降序</DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
                     </Col>
                     <Col span="12" offset="8" style="text-align: right;">
                         <ButtonGroup>
@@ -172,10 +185,10 @@
 
                 return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
             },
-            getPathData(path, func, only_folder = false) {
+            getPathData(path, func, only_folder = false, orderby = 'name', order = 'asc') {
                 this.spin_show = true;
                 var Data = [];
-                axios.get(this.base_url + 'api/v1/files?path=' + path)
+                axios.get(this.base_url + 'api/v1/files?path=' + encodeURIComponent(path) + '&order_by=' + orderby + '&order=' + order)
                     .then(result => {
                         this.spin_show = false;
                         const fdata = result.data.list;
@@ -261,6 +274,11 @@
                 } else {
                     this.checkGroup = [];
                 }
+            },
+            fileSort(name) {
+                let names = name.split('-');
+                let cur_dir = "/" + this.bread_item.join('/');
+                this.getPathData(cur_dir, this.setCurrentFolder, false, names[0], names[1]);
             },
             checkAllGroupChange(data) {
                 if (data.length === this.current_folders.length) {
