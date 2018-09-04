@@ -1,6 +1,17 @@
 <template>
     <Layout>
-        <Sider :width="300" hide-trigger style="overflow-y: auto;overflow-x: hidden;background: #fff">
+        <Modal
+                v-model="modalFlag"
+                @on-visible-change="modelVisible">
+            <FileSelectComponent :global_data="global_data"></FileSelectComponent>
+            <div slot="footer">
+                <Button type="success" long @click="confirmUpload">
+                    <Icon type="md-cloud-upload"></Icon>
+                    上传
+                </Button>
+            </div>
+        </Modal>
+        <Sider :width="300" hide-trigger style="padding: 10px;overflow-y: auto;overflow-x: hidden;background: #fff">
             <Tree :data="folders" :load-data="loadData" @on-select-change="treeSelect"></Tree>
         </Sider>
         <Layout :style="{padding: '0 24px 24px'}">
@@ -28,26 +39,43 @@
                             <Icon type="md-apps" size="24" v-if="files_view_mode === 2"></Icon>
                         </Button>
                     </Col>
-                    <Col span="2" offset="8">
-                        <Button type="info" @click="addItemToClipboard('copy')" icon="md-copy">复制</Button>
-                    </Col>
-                    <Col span="2">
-                        <Button type="warning" @click="addItemToClipboard('move')" icon="md-cut">剪切</Button>
-                    </Col>
-                    <Col span="2">
-                        <Button type="success" @click="pasteClipboard" icon="md-clipboard">粘贴</Button>
-                    </Col>
-                    <Col span="2">
-                        <Button type="success" @click="mkdirFunc" icon="md-add">新建</Button>
-                    </Col>
-                    <Col span="2">
-                        <Button type="error" @click="removeFiles" icon="md-trash">删除</Button>
-                    </Col>
-                    <Col span="2">
-                        <Button type="primary" @click="downloadFiles" icon="md-download">下载</Button>
+                    <Col span="12" offset="8" style="text-align: right;">
+                        <ButtonGroup>
+                            <Button @click="addItemToClipboard('copy')">
+                                <Icon type="md-copy"></Icon>
+                                复制
+                            </Button>
+                            <Button @click="addItemToClipboard('move')">
+                                <Icon type="md-cut"></Icon>
+                                剪切
+                            </Button>
+                            <Button @click="pasteClipboard">
+                                <Icon type="md-clipboard"></Icon>
+                                粘贴
+                            </Button>
+                            <Button @click="shareFiles">
+                                <Icon type="md-share"></Icon>
+                                分享
+                            </Button>
+                            <Button type="info" @click="mkdirFunc">
+                                <Icon type="md-add"></Icon>
+                                新建
+                            </Button>
+                            <Button type="error" @click="removeFiles">
+                                <Icon type="md-trash"></Icon>
+                                删除
+                            </Button>
+                            <Button type="success" @click="uploadClick">
+                                <Icon type="md-cloud-upload"></Icon>
+                                上传
+                            </Button>
+                            <Button type="primary" @click="downloadFiles">
+                                <Icon type="md-download"></Icon>
+                                下载
+                            </Button>
+                        </ButtonGroup>
                     </Col>
                 </Row>
-
                 <Divider/>
                 <div class="icons">
                     <CheckboxGroup style="overflow: auto; height: 100%;" v-model="checkGroup"
@@ -71,13 +99,13 @@
                                 <Col span="1">
                                     <Checkbox :label="item.path"><span></span></Checkbox>
                                 </Col>
-                                <Col span="17" style="overflow: hidden;">
+                                <Col span="17" style="overflow: hidden;white-space: nowrap;">
                                     <Icon type="ios-folder-outline" size="24" v-if="item.isdir"/>
                                     <Icon type="ios-document" size="24" v-if="!item.isdir"/>
                                     {{item.title}}
                                 </Col>
-                                <Col span="3">{{item.size}}</Col>
-                                <Col span="3">{{item.mtime}}</Col>
+                                <Col span="3"> {{item.size}}</Col>
+                                <Col span="3"> {{item.mtime}}</Col>
                             </Row>
                         </div>
                     </CheckboxGroup>
@@ -89,6 +117,7 @@
 
 <script>
     import axios from 'axios'
+    import FileSelectComponent from './file_select'
 
     export default {
         name: "file_manager",
@@ -113,10 +142,12 @@
                 clipboard_method: "",
                 checkAll: false,
                 indeterminate: false,
-                new_folder_name: ""
+                new_folder_name: "",
+                modalFlag: false
             }
         },
-        props: ['wsocket', 'pending_download_data'],
+        components: {FileSelectComponent},
+        props: ['global_data'],
         methods: {
             formatDateTime(inputTime) {
                 var date = new Date(inputTime);
@@ -246,11 +277,12 @@
             addItemToClipboard(method) {
                 if (this.checkGroup.length === 0) {
                     this.$Message.warning('请至少选择一个文件或者文件夹');
-                    return;
+                    return false;
                 }
 
                 this.clipboard = this.checkGroup.slice();
                 this.clipboard_method = method;
+                return true;
             },
             pasteClipboard(add_cur_dir = true) {
                 var paths = this.clipboard.join('|');
@@ -282,14 +314,66 @@
                     }
                 });
             },
-            downloadFiles() {
-                this.addItemToClipboard('');
-                for (let i = 0; i < this.clipboard.length; i++) {
-                    this.pending_download_data.push(this.clipboard[i])
+            uploadClick() {
+                this.modalFlag = true;
+            },
+            pressBackKey(e) {
+                if (e.keyCode === 8) {
+                    this.global_data.press_back_key = true;
                 }
+            },
+            modelVisible(v) {
+                if (v) {
+                    window.addEventListener('keydown', this.pressBackKey)
+                } else {
+                    window.removeEventListener('keydown', this.pressBackKey)
+                }
+            },
+            confirmUpload() {
+                var cur_dir = "/" + this.bread_item.join('/');
+                this.global_data.pending_upload_data.push(cur_dir);
+                this.global_data.send_upload_signal = 1;
+                this.$Message.success('已经添加到上传队列!');
+                this.modalFlag = false;
+            },
+            downloadFiles() {
+                if (this.addItemToClipboard('') === false) {
+                    return
+                }
+                for (let i = 0; i < this.clipboard.length; i++) {
+                    this.global_data.pending_download_data.push(this.clipboard[i])
+                }
+                this.global_data.send_download_signal = true;
                 this.$Message.success('已经添加到下载队列!');
                 this.checkGroup = [];
                 this.indeterminate = false;
+            },
+            shareFiles() {
+                if (this.addItemToClipboard('') === false) {
+                    return
+                }
+                let paths = "";
+                for (let i = 0; i < this.clipboard.length; i++) {
+                    paths += this.clipboard[i] + "|";
+                }
+                paths = paths.substr(0, paths.length - 1);
+                axios.get(this.base_url + 'api/v1/share?method=set&paths=' + encodeURIComponent(paths))
+                    .then(result => {
+                        if (result.data.code === 0) {
+                            this.$Message.success({
+                                content: '分享成功, 链接: ' + result.data.msg,
+                                duration: 10
+                            });
+                            this.checkGroup = [];
+                            this.indeterminate = false;
+                            this.global_data.share_refresh = true;
+                        } else {
+                            this.$Message.error({
+                                content: result.data.msg,
+                                duration: 10
+                            });
+                        }
+                    });
             },
             mkdirFunc() {
                 this.$Modal.confirm({

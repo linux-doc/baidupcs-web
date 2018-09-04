@@ -19,3 +19,8 @@ html, body, #app, .layout, .ivu-layout {
     height: calc(100% - 90px);
     zoom: 1;
 }
+
+.ivu-col {
+    padding-left: 8px;
+    padding-right: 8px;
+}

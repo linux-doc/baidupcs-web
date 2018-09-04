@@ -17,7 +17,7 @@
     }
 
     .layout-nav {
-        width: 420px;
+        width: 560px;
         margin: 0 auto;
         margin-right: 20px;
     }
@@ -38,20 +38,50 @@
                                 <Icon type="ios-cloud-download"/>
                                 下载管理
                             </MenuItem>
-                            <Submenu name="3">
+                            <MenuItem name="3">
+                                <Icon type="md-share"/>
+                                分享管理
+                            </MenuItem>
+                            <Submenu name="4">
                                 <template slot="title">
                                     <Icon type="md-person"/>
                                     {{baidu_name}}
                                 </template>
-                                <MenuItem name="3-1">设置</MenuItem>
-                                <MenuItem name="3-2">退出</MenuItem>
+                                <MenuItem name="4-1">设置</MenuItem>
+                                <MenuItem name="4-2">退出</MenuItem>
                             </Submenu>
                         </div>
                     </Menu>
                 </Header>
-                <file_manager_component :pending_download_data="pending_download_data"
+                <file_manager_component :global_data="globalData"
                                         v-show='select_menu_name === "1"'/>
-                <download_component :pending_download_data="pending_download_data" v-show='select_menu_name === "2"'/>
+                <download_component :global_data="globalData"
+                                    v-show='select_menu_name === "2"'/>
+                <Modal v-model="modalSettingFlag" @on-ok="updateSetting">
+                    <Row type="flex" justify="center" align="middle" v-if="quota_data.flag">
+                        <Col span="5">
+                            <p style="font-size: 16px">百度云存储</p>
+                        </Col>
+                        <Col span="5">
+                            <Circle :percent="quota_data.data.percent" :size="80">
+                                <span style="font-size:16px">{{quota_data.data.percent}}%</span>
+                                <div style="font-size:10px">还剩 {{quota_data.data.un_used}}</div>
+                            </Circle>
+                        </Col>
+                    </Row>
+                    <Form style="margin-top: 16px" ref="settingForm" :model="formData" :label-width="110">
+                        <FormItem :label="item.name" v-for="item in formData.config">
+                            <Input v-model="item.value"></Input>
+                            <p>{{item.desc}}</p>
+                        </FormItem>
+                    </Form>
+                </Modal>
+                <Modal v-model="modalShareFlag" :width="800" cancel-text="">
+                    <share_component :global_data="globalData"></share_component>
+                    <div slot="footer">
+                        <Button type="info" @click="modalShareFlag = false">确认</Button>
+                    </div>
+                </Modal>
             </Layout>
         </div>
         <login_component v-if="!login_flag"/>
@@ -62,6 +92,7 @@
     import login_component from './views/login'
     import file_manager_component from './views/file_manager'
     import download_component from './views/download'
+    import share_component from './views/share'
     export default {
         data () {
             return {
@@ -69,10 +100,24 @@
                 login_flag: false,
                 select_menu_name: "1",
                 baidu_name: "",
-                pending_download_data: []
+                quota_data: {
+                    flag: false,
+                    data: {}
+                },
+                modalSettingFlag: false,
+                modalShareFlag: false,
+                formData: {config: []},
+                globalData: {
+                    pending_download_data: [],
+                    send_download_signal: false,
+                    pending_upload_data: [],
+                    send_upload_signal: 0,
+                    press_back_key: false,
+                    share_refresh: false,
+                }
             }
         },
-        components: {login_component, file_manager_component, download_component},
+        components: {login_component, file_manager_component, download_component, share_component},
         mounted () {
             axios.get(this.base_url + 'api/v1/user')
                 .then(result => {
@@ -80,6 +125,12 @@
                         this.login_flag = true;
                         this.baidu_name = result.data.data.name;
                     }
+                })
+                .catch(reason => {
+                    this.$Message.error({
+                        content: '与服务器联系断开 ' + reason.toString(),
+                        duration: 10
+                    });
                 });
         },
         beforeDestroy () {
@@ -87,8 +138,29 @@
         },
         methods: {
             getMenuName(name) {
-                this.select_menu_name = name;
-                if (name === "3-2") {
+                if (name === "3") {
+                    this.modalShareFlag = true;
+                    return;
+                }
+                if (name === "4-1") {
+                    axios.get(this.base_url + 'api/v1/quota')
+                        .then(result => {
+                            if (result.data.code === 0) {
+                                this.quota_data.data = JSON.parse(result.data.data);
+                                this.quota_data.flag = true;
+                            }
+                        });
+                    axios.get(this.base_url + 'api/v1/setting?method=get')
+                        .then(result => {
+                            if (result.data.code === 0) {
+                                this.formData.config = result.data.data;
+                                this.formData.config.shift();
+                            }
+                        });
+                    this.modalSettingFlag = true;
+                    return;
+                }
+                if (name === "4-2") {
                     this.$Modal.confirm({
                         title: '退出登录',
                         okText: '确定',
@@ -101,8 +173,28 @@
                                 });
                         }
                     });
+                    return;
                 }
+                this.select_menu_name = name;
             },
+            updateSetting() {
+                let settings = this.$refs['settingForm'].model.config;
+                let params = "";
+                for (let i = 0; i < settings.length; i++) {
+                    params += '&' + settings[i].en_name + '=' + settings[i].value;
+                }
+                axios.get(this.base_url + 'api/v1/setting?method=set' + params)
+                    .then(result => {
+                        if (result.data.code === -1) {
+                            this.$Message.error({
+                                content: result.data.msg,
+                                duration: 10
+                            });
+                            return
+                        }
+                        this.$Message.success("配置保存成功");
+                    });
+            }
         }
     }
 </script>
