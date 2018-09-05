@@ -31,12 +31,12 @@
                         <img class="layout-logo" src="./images/baiduyun_logo.png"/>
                         <div class="layout-nav">
                             <MenuItem name="1">
-                                <Icon type="ios-folder"/>
+                                <Icon type="md-folder"/>
                                 文件管理
                             </MenuItem>
                             <MenuItem name="2">
-                                <Icon type="ios-cloud-download"/>
-                                下载管理
+                                <Icon type="md-cloud"/>
+                                上传下载管理
                             </MenuItem>
                             <MenuItem name="3">
                                 <Icon type="md-share"/>

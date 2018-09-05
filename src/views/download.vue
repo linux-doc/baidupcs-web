@@ -5,7 +5,7 @@
                   @on-select="getMenuName">
                 <Submenu name="1">
                     <template slot="title">
-                        <Icon type="ios-navigate"></Icon>
+                        <Icon type="ios-cloud-download"></Icon>
                         我的下载
                     </template>
                     <MenuItem name="1-1">正在下载</MenuItem>
@@ -13,135 +13,47 @@
                 </Submenu>
                 <Submenu name="2">
                     <template slot="title">
+                        <Icon type="ios-cloud-upload"></Icon>
+                        我的上传
+                    </template>
+                    <MenuItem name="2-1">正在上传</MenuItem>
+                    <MenuItem name="2-2">已经完成</MenuItem>
+                </Submenu>
+                <Submenu name="3">
+                    <template slot="title">
                         <Icon type="ios-keypad"></Icon>
                         离线下载
                     </template>
-                    <MenuItem name="2-1">Option 1</MenuItem>
-                    <MenuItem name="2-2">Option 2</MenuItem>
+                    <MenuItem name="3-1">TODO</MenuItem>
+                    <MenuItem name="3-2">TODO</MenuItem>
                 </Submenu>
             </Menu>
         </Sider>
-        <Modal v-model="modalDetailFlag" draggable title="任务详情" :width="800">
-            <Row>
-                <Col span="4"><p style="font-size: 14px">任务ID</p></Col>
-                <Col span="4"><p style="font-size: 14px">任务状态</p></Col>
-                <Col span="4"><p style="font-size: 14px">速度</p></Col>
-                <Col span="12"><p style="font-size: 14px">错误信息</p></Col>
-            </Row>
-            <div style="height: 60vh; overflow-y: auto">
-                <Row v-for="item in taskDetail">
-                    <Col span="4">
-                        <p style="font-size: 14px">{{item.id}}</p>
-                    </Col>
-                    <Col span="4">
-                        <p style="font-size: 14px">{{item.status}}</p>
-                    </Col>
-                    <Col span="4">
-                        <p style="font-size: 14px">{{item.speed}}/s</p>
-                    </Col>
-                    <Col span="12">
-                        <p style="font-size: 14px">{{item.error}}</p>
-                    </Col>
-                </Row>
-            </div>
-            <div slot="footer">
-                <Button type="info" @click="modalDetailFlag = false">确认</Button>
-            </div>
-        </Modal>
         <Layout :style="{padding: '0 24px 24px'}">
-            <Card :bordered="false" style="margin-top: 16px" v-for="item in downloading"
-                  v-if="select_menu_name === '1-1'">
-                <p slot="title">{{item.name}}
-                    <Divider type="vertical"/>
-                    {{item.total_size}}
-                </p>
-                <Row>
-                    <Col span="12">
-                        <Progress :percent="item.percent" status="active"/>
-                    </Col>
-                    <Col span="2">
-                        <Button size="small" type="warning" ghost v-if="!item.is_pause"
-                                @click="swichDownloadStatus(item)">
-                            <Icon type="md-pause"></Icon>
-                        </Button>
-                        <Button size="small" type="success" ghost v-if="item.is_pause"
-                                @click="swichDownloadStatus(item)">
-                            <Icon type="md-play"></Icon>
-                        </Button>
-                        <Button size="small" type="error" ghost @click="cancelTask(item)">
-                            <Icon type="md-close"></Icon>
-                        </Button>
-                        <Button size="small" type="info" ghost @click="detailTask(item)">
-                            <Icon type="md-barcode"></Icon>
-                        </Button>
-                    </Col>
-                    <Col span="10">
-                        <p>
-                            速度: {{item.speed}}/s
-                            <Divider type="vertical"/>
-                            已经下载: {{item.download_size}}
-                            <Divider type="vertical"/>
-                            已用时间: {{item.time_used}}
-                            <Divider type="vertical"/>
-                            预计还需: {{item.time_left}}
-                        </p>
-                    </Col>
-                </Row>
-            </Card>
-            <Card :bordered="false" style="margin-top: 16px" v-for="item in pending_download"
-                  v-if="select_menu_name === '1-1'">
-                <p slot="title">{{item.name}}
-                    <Divider type="vertical"/>
-                    等待下载...
-                </p>
-                <Row>
-                    <Col span="12">
-                        <Progress :percent="item.percent" status="active"/>
-                    </Col>
-                    <Col span="10" offset="2">
-                        <p>
-                            速度: {{item.speed}}/s
-                            <Divider type="vertical"/>
-                            已经下载: {{item.download_size}}
-                            <Divider type="vertical"/>
-                            已用时间: {{item.time_used}}
-                            <Divider type="vertical"/>
-                            预计还需: {{item.time_left}}
-                        </p>
-                    </Col>
-                </Row>
-            </Card>
-            <Card :bordered="false" style="margin-top: 16px" v-for="item in downloaded"
-                  v-if="select_menu_name === '1-2'">
-                <p slot="title">{{item.name}}
-                    <Divider type="vertical"/>
-                    {{item.total_size}}
-                </p>
-                <Row>
-                    <Col span="8">
-                        <Progress :percent="item.percent" status="active"/>
-                    </Col>
-                    <Col span="16">
-                        <p>
-                            平均速度: {{item.avg_speed}}/s
-                            <Divider type="vertical"/>
-                            已用时间: {{item.time_used}}
-                            <Divider type="vertical"/>
-                            保存路径: {{item.save_path}}
-                        </p>
-                    </Col>
-                </Row>
-            </Card>
+            <!--下载相关-->
+            <ProcessItemComponent :items="downloading" itype="1" istatus="2"
+                                  v-if="select_menu_name === '1-1'"></ProcessItemComponent>
+            <ProcessItemComponent :items="pending_download" itype="1" istatus="1"
+                                  v-if="select_menu_name === '1-1'"></ProcessItemComponent>
+            <ProcessItemComponent :items="downloaded" itype="1" istatus="3"
+                                  v-if="select_menu_name === '1-2'"></ProcessItemComponent>
+
+            <!--上传相关-->
+            <ProcessItemComponent :items="uploading" itype="2" istatus="2"
+                                  v-if="select_menu_name === '2-1'"></ProcessItemComponent>
+            <ProcessItemComponent :items="pending_upload" itype="2" istatus="1"
+                                  v-if="select_menu_name === '2-1'"></ProcessItemComponent>
+            <ProcessItemComponent :items="uploaded" itype="2" istatus="3"
+                                  v-if="select_menu_name === '2-2'"></ProcessItemComponent>
         </Layout>
     </Layout>
 </template>
 
 <script>
-    import axios from 'axios'
-    import CollapseTransition from "iview/src/components/base/collapse-transition";
+    import ProcessItemComponent from "./process_item";
     export default {
         name: "download",
-        components: {CollapseTransition},
+        components: {ProcessItemComponent},
         data() {
             return {
                 select_menu_name: "1-1",
@@ -149,7 +61,6 @@
                 ws_url: 'ws://127.0.0.1:8081/ws',
                 websocket: null,
                 modalDetailFlag: false,
-                taskDetail: [],
                 pending_download: [],
                 downloading: [
                     // {
@@ -166,7 +77,10 @@
                     //     status: 1,
                     // }
                 ],
-                downloaded: []
+                downloaded: [],
+                pending_upload: [],
+                uploading: [],
+                uploaded: []
             }
         },
         props: ['global_data'],
@@ -210,15 +124,40 @@
             'global_data.send_upload_signal'(cur_val) {
                 if (cur_val === 2) {
                     let pending = this.global_data.pending_upload_data;
-                    console.log(pending);
+                    if (pending.length === 1) {
+                        this.$Message.error('请至少选择一个文件');
+                        pending.pop();
+                        this.global_data.send_upload_signal = 0;
+                        return;
+                    }
+
                     let tpath = pending.shift();
+                    for (let i = 0; i < pending.length; i++) {
+                        if (this.indexPendingUploadList(pending[i]) !== -1) {
+                            continue;
+                        }
+
+                        let fd_names = pending[i].split("/");
+                        this.pending_upload.push({
+                            lastID: 0,
+                            path: pending[i],
+                            name: fd_names[fd_names.length - 1],
+                            speed: "0KB",
+                            time_used: "0s",
+                            uploaded_size: "0KB",
+                            total_size: "--KB",
+                            time_left: "--s",
+                            percent: 0,
+                            status: 0,
+                        })
+                    }
                     var send_json = {
                         "type": 3,
                         "paths": pending,
                         "tpath": tpath
                     };
-                    console.log(send_json);
                     this.websocket.send(JSON.stringify(send_json));
+                    this.$Message.success('已经添加到上传队列!');
 
                     while (pending.length > 0) {
                         pending.pop()
@@ -257,38 +196,44 @@
                         closable: true
                     });
                 }
-                if (redata.type === 2) {
-                    var data = redata.data.replace(/\\/g, '/');
-                    data = JSON.parse(data);
-                    if (redata.status === 1) {
-                        var index = this.indexPendingDownloadList(data.path);
-                        if (index > -1) {
-                            this.pending_download.splice(index, 1);
-                        }
 
-                        var fd_names = data.path.split("/");
-                        this.downloading.push({
-                            lastID: data.LastID,
-                            path: data.path,
-                            name: fd_names[fd_names.length - 1],
-                            speed: "0KB",
-                            avg_speed: "0KB",
-                            time_used: "0s",
-                            download_size: "0KB",
-                            total_size: "--KB",
-                            time_left: "--s",
-                            percent: 0,
-                            is_pause: false,
-                            status: redata.status,
-                        })
-                    }
-                    if (redata.status === 2) {
-                        this.removeDownloadingList(data.path);
-                    }
-                    if (redata.status === 5) {
-                        for (let i = 0; i < this.downloading.length; i++) {
-                            let ditem = this.downloading[i];
-                            if (ditem.lastID === data.LastID && !ditem.is_pause) {
+                let pos = 0;
+                let ditem = {};
+                let data = redata.data.replace(/\\/g, '/');
+                data = JSON.parse(data);
+
+                //下载任务
+                if (redata.type === 2) {
+                    switch (redata.status) {
+                        case 1: //添加到下载任务列表
+                            let index = this.indexPendingDownloadList(data.path);
+                            if (index > -1) {
+                                this.pending_download.splice(index, 1);
+                            }
+
+                            let fd_names = data.path.split("/");
+                            this.downloading.push({
+                                lastID: data.LastID,
+                                path: data.path,
+                                name: fd_names[fd_names.length - 1],
+                                speed: "0KB",
+                                avg_speed: "0KB",
+                                time_used: "0s",
+                                download_size: "0KB",
+                                total_size: "--KB",
+                                time_left: "--s",
+                                percent: 0,
+                                is_pause: false,
+                                status: redata.status,
+                            });
+                            break;
+                        case 2:
+                            this.removeDownloadingList(data.path);
+                            break;
+                        case 5: //正在下载
+                            pos = this.getIndexFromArray(this.downloading, data.LastID);
+                            ditem = this.downloading[pos];
+                            if (!ditem.is_pause) {
                                 ditem.speed = data.speed;
                                 ditem.avg_speed = data.avg_speed;
                                 ditem.time_used = data.time_used;
@@ -298,61 +243,128 @@
                                 ditem.percent = data.percent;
                                 ditem.status = redata.status;
                             }
-                        }
-                    }
-                    if (redata.status === 6) {
-                        for (let i = 0; i < this.downloading.length; i++) {
-                            let ditem = this.downloading[i];
-                            if (ditem.lastID === data.LastID) {
-                                ditem.is_pause = true;
-                                ditem.speed = "0KB";
-                                ditem.avg_speed = "0KB";
-                                ditem.time_left = "--s";
-                                ditem.status = redata.status;
-                            }
-                        }
-                    }
-                    if (redata.status === 7) {
-                        for (let i = 0; i < this.downloading.length; i++) {
-                            let ditem = this.downloading[i];
-                            if (ditem.lastID === data.LastID) {
-                                ditem.is_pause = false;
-                                ditem.status = redata.status;
-                            }
-                        }
-                    }
-                    if (redata.status === 8) {
-                        for (let i = 0; i < this.downloading.length; i++) {
-                            let ditem = this.downloading[i];
-                            if (ditem.lastID === data.LastID) {
-                                this.downloading.splice(i, 1);
-                            }
-                        }
-                    }
-                    if (redata.status === 9) {
-                        for (let i = 0; i < this.downloading.length; i++) {
-                            let ditem = this.downloading[i];
-                            if (ditem.lastID === data.LastID) {
-                                this.downloaded.push({
-                                    lastID: ditem.lastID,
-                                    path: ditem.path,
-                                    name: ditem.name,
-                                    speed: ditem.speed,
-                                    avg_speed: ditem.avg_speed,
-                                    time_used: ditem.time_used,
-                                    download_size: ditem.download_size,
-                                    total_size: ditem.total_size,
-                                    time_left: "0s",
-                                    percent: 100,
-                                    status: redata.status,
-                                    save_path: data.savePath,
-                                });
-                                this.downloading.splice(i, 1);
-                            }
-                        }
+                            break;
+                        case 6: //任务暂停
+                            pos = this.getIndexFromArray(this.downloading, data.LastID);
+                            ditem = this.downloading[pos];
+                            ditem.is_pause = true;
+                            ditem.speed = "0KB";
+                            ditem.avg_speed = "0KB";
+                            ditem.time_left = "--s";
+                            ditem.status = redata.status;
+                            break;
+                        case 7: //任务恢复
+                            pos = this.getIndexFromArray(this.downloading, data.LastID);
+                            ditem = this.downloading[pos];
+                            ditem.is_pause = false;
+                            ditem.status = redata.status;
+                            break;
+                        case 8: //任务删除
+                            pos = this.getIndexFromArray(this.downloading, data.LastID);
+                            this.downloading.splice(pos, 1);
+                            break;
+                        case 9: //任务完成
+                            pos = this.getIndexFromArray(this.downloading, data.LastID);
+                            ditem = this.downloading[pos];
+                            this.downloaded.push({
+                                lastID: ditem.lastID,
+                                path: ditem.path,
+                                name: ditem.name,
+                                speed: ditem.speed,
+                                avg_speed: ditem.avg_speed,
+                                time_used: ditem.time_used,
+                                download_size: ditem.download_size,
+                                total_size: ditem.total_size,
+                                time_left: "0s",
+                                percent: 100,
+                                status: redata.status,
+                                save_path: data.savePath,
+                            });
+                            this.downloading.splice(pos, 1);
+                            break;
                     }
                 }
-                // console.log(redata);
+
+                //上传任务
+                if (redata.type === 3) {
+                    switch (redata.status) {
+                        case 1: //添加到上传任务中
+                            let index = this.indexPendingUploadList(data.path);
+                            if (index > -1) {
+                                this.pending_upload.splice(index, 1);
+                            }
+
+                            let fd_names = data.path.split("/");
+                            this.uploading.push({
+                                lastID: data.LastID,
+                                path: data.path,
+                                name: fd_names[fd_names.length - 1],
+                                speed: "0KB",
+                                avg_speed: "0KB",
+                                time_used: "0s",
+                                uploaded_size: "0KB",
+                                total_size: "--KB",
+                                time_left: "--s",
+                                percent: 0,
+                                is_pause: false,
+                                status: redata.status,
+                            });
+                            break;
+                        case 2:
+                            break;
+                        case 3: //秒传成功
+                            pos = this.getIndexFromArray(this.uploading, data.LastID);
+                            ditem = this.uploading[pos];
+                            this.uploaded.push({
+                                lastID: ditem.lastID,
+                                path: ditem.path,
+                                name: ditem.name,
+                                speed: ditem.speed,
+                                avg_speed: ditem.avg_speed,
+                                time_used: ditem.time_used,
+                                uploaded_size: ditem.uploaded_size,
+                                total_size: ditem.total_size,
+                                time_left: "0s",
+                                percent: 100,
+                                status: redata.status,
+                                save_path: data.savePath,
+                            });
+                            this.uploading.splice(pos, 1);
+
+                            break;
+                        case 4: //正在上传
+                            pos = this.getIndexFromArray(this.uploading, data.LastID);
+                            ditem = this.uploading[pos];
+                            ditem.speed = data.speed;
+                            ditem.avg_speed = data.avg_speed;
+                            ditem.time_used = data.time_used;
+                            ditem.uploaded_size = data.uploaded_size;
+                            ditem.total_size = data.total_size;
+                            ditem.time_left = data.time_left;
+                            ditem.percent = data.percent;
+                            ditem.status = redata.status;
+                            break;
+                        case 5: //上传完成
+                            pos = this.getIndexFromArray(this.uploading, data.LastID);
+                            ditem = this.uploading[pos];
+                            this.uploaded.push({
+                                lastID: ditem.lastID,
+                                path: ditem.path,
+                                name: ditem.name,
+                                speed: ditem.speed,
+                                avg_speed: ditem.avg_speed,
+                                time_used: ditem.time_used,
+                                uploaded_size: ditem.uploaded_size,
+                                total_size: ditem.total_size,
+                                time_left: "0s",
+                                percent: 100,
+                                status: redata.status,
+                                save_path: data.savePath,
+                            });
+                            this.uploading.splice(pos, 1);
+                            break;
+                    }
+                }
             },
             indexPendingDownloadList(path) {
                 for (let i = 0; i < this.pending_download.length; i++) {
@@ -362,6 +374,21 @@
                 }
                 return -1;
             },
+            indexPendingUploadList(path) {
+                for (let i = 0; i < this.pending_upload.length; i++) {
+                    if (path === this.pending_upload[i].path) {
+                        return i;
+                    }
+                }
+                return -1;
+            },
+            getIndexFromArray(array, id) {
+                for (let i = 0; i < array.length; i++) {
+                    let ditem = array[i];
+                    if (ditem.lastID === id)
+                        return i;
+                }
+            },
             removeDownloadingList(path) {
                 for (let i = 0; i < this.downloading.length; i++) {
                     if (path === this.downloading[i].path) {
@@ -369,81 +396,6 @@
                     }
                 }
             },
-            swichDownloadStatus(item) {
-                let method = "";
-                if (item.is_pause) {
-                    method = "resume";
-                } else {
-                    method = "pause";
-                }
-                axios.get(this.base_url + 'api/v1/download?method=' + method + '&id=' + item.lastID)
-                    .then(result => {
-                        if (result.data.code === 0) {
-                            this.$Message.success('操作成功');
-                        } else {
-                            this.$Message.error({
-                                content: result.data.msg,
-                                duration: 10,
-                                closable: true
-                            });
-                        }
-                    });
-            },
-            cancelTask(item) {
-                axios.get(this.base_url + 'api/v1/download?method=cancel&id=' + item.lastID)
-                    .then(result => {
-                        if (result.data.code === 0) {
-                            this.$Message.success('操作成功');
-                        } else {
-                            this.$Message.error({
-                                content: result.data.msg,
-                                duration: 10,
-                                closable: true
-                            });
-                        }
-                    });
-            },
-            bytesToSize(bytes) {
-                if (bytes === 0) return '0 B';
-                var k = 1000, // or 1024
-                    sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-                    i = Math.floor(Math.log(bytes) / Math.log(k));
-
-                return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
-            },
-            getTaskStatus(id) {
-                axios.get(this.base_url + 'api/v1/download?method=status&id=' + id)
-                    .then(result => {
-                        if (result.data.code === 0) {
-                            this.taskDetail = [];
-                            let details = result.data.data;
-                            for (let i = 0; i < details.length; i++) {
-                                let error = "";
-                                if (details[i].error !== "<nil>")
-                                    error = details[i].error;
-                                this.taskDetail.push({
-                                    id: details[i].id,
-                                    status: details[i].status,
-                                    speed: this.bytesToSize(details[i].speed),
-                                    error: error,
-                                })
-                            }
-                            if (this.modalDetailFlag) {
-                                setTimeout(() => this.getTaskStatus(id), 1000);
-                            }
-                        } else {
-                            this.$Message.error({
-                                content: result.data.msg,
-                                duration: 10,
-                                closable: true
-                            });
-                        }
-                    });
-            },
-            detailTask(item) {
-                this.getTaskStatus(item.lastID);
-                this.modalDetailFlag = true;
-            }
         },
         mounted() {
             this.initWebSocket()
