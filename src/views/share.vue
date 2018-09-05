@@ -17,7 +17,7 @@
             <Col span="2">{{item.password}}</Col>
             <Col span="10">{{item.link}}</Col>
             <Col span="2">
-                <Button icon="md-close" type="error" @click="cancelShare(item.id)"></Button>
+                <Button icon="md-close" type="error" ghost @click="cancelShare(item.id)"></Button>
             </Col>
         </Row>
     </div>
