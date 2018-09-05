@@ -21,6 +21,33 @@
                 </Submenu>
             </Menu>
         </Sider>
+        <Modal v-model="modalDetailFlag" draggable title="任务详情" :width="800">
+            <Row>
+                <Col span="4"><p style="font-size: 14px">任务ID</p></Col>
+                <Col span="4"><p style="font-size: 14px">任务状态</p></Col>
+                <Col span="4"><p style="font-size: 14px">速度</p></Col>
+                <Col span="12"><p style="font-size: 14px">错误信息</p></Col>
+            </Row>
+            <div style="height: 60vh; overflow-y: auto">
+                <Row v-for="item in taskDetail">
+                    <Col span="4">
+                        <p style="font-size: 14px">{{item.id}}</p>
+                    </Col>
+                    <Col span="4">
+                        <p style="font-size: 14px">{{item.status}}</p>
+                    </Col>
+                    <Col span="4">
+                        <p style="font-size: 14px">{{item.speed}}/s</p>
+                    </Col>
+                    <Col span="12">
+                        <p style="font-size: 14px">{{item.error}}</p>
+                    </Col>
+                </Row>
+            </div>
+            <div slot="footer">
+                <Button type="info" @click="modalDetailFlag = false">确认</Button>
+            </div>
+        </Modal>
         <Layout :style="{padding: '0 24px 24px'}">
             <Card :bordered="false" style="margin-top: 16px" v-for="item in downloading"
                   v-if="select_menu_name === '1-1'">
@@ -32,7 +59,23 @@
                     <Col span="12">
                         <Progress :percent="item.percent" status="active"/>
                     </Col>
-                    <Col span="10" offset="2">
+                    <Col span="2">
+                        <Button size="small" type="warning" ghost v-if="!item.is_pause"
+                                @click="swichDownloadStatus(item)">
+                            <Icon type="md-pause"></Icon>
+                        </Button>
+                        <Button size="small" type="success" ghost v-if="item.is_pause"
+                                @click="swichDownloadStatus(item)">
+                            <Icon type="md-play"></Icon>
+                        </Button>
+                        <Button size="small" type="error" ghost @click="cancelTask(item)">
+                            <Icon type="md-close"></Icon>
+                        </Button>
+                        <Button size="small" type="info" ghost @click="detailTask(item)">
+                            <Icon type="md-barcode"></Icon>
+                        </Button>
+                    </Col>
+                    <Col span="10">
                         <p>
                             速度: {{item.speed}}/s
                             <Divider type="vertical"/>
@@ -94,13 +137,19 @@
 </template>
 
 <script>
+    import axios from 'axios'
+    import CollapseTransition from "iview/src/components/base/collapse-transition";
     export default {
         name: "download",
+        components: {CollapseTransition},
         data() {
             return {
                 select_menu_name: "1-1",
+                base_url: 'http://127.0.0.1:8081/',
                 ws_url: 'ws://127.0.0.1:8081/ws',
                 websocket: null,
+                modalDetailFlag: false,
+                taskDetail: [],
                 pending_download: [],
                 downloading: [
                     // {
@@ -113,6 +162,20 @@
                     //     percent: 0.03,
                     //     name: "kanong",
                     //     path: "./kanong",
+                    //     is_pause: true,
+                    //     status: 1,
+                    // },
+                    // {
+                    //     lastID: 2,
+                    //     download_size: "585.94KB",
+                    //     total_size: "18.43MB",
+                    //     speed: "5.37KB",
+                    //     time_used: "1s",
+                    //     time_left: "56m46s",
+                    //     percent: 0.03,
+                    //     name: "kanong",
+                    //     path: "./kanong",
+                    //     is_pause: false,
                     //     status: 1,
                     // }
                 ],
@@ -146,6 +209,7 @@
 
                     var send_json = {
                         "type": 2,
+                        "method": "download",
                         "paths": this.global_data.pending_download_data
                     };
                     this.websocket.send(JSON.stringify(send_json));
@@ -217,7 +281,7 @@
 
                         var fd_names = data.path.split("/");
                         this.downloading.push({
-                            lastID: data.lastID,
+                            lastID: data.LastID,
                             path: data.path,
                             name: fd_names[fd_names.length - 1],
                             speed: "0KB",
@@ -227,6 +291,7 @@
                             total_size: "--KB",
                             time_left: "--s",
                             percent: 0,
+                            is_pause: false,
                             status: redata.status,
                         })
                     }
@@ -236,7 +301,7 @@
                     if (redata.status === 5) {
                         for (let i = 0; i < this.downloading.length; i++) {
                             let ditem = this.downloading[i];
-                            if (ditem.lastID === data.lastID) {
+                            if (ditem.lastID === data.LastID) {
                                 ditem.speed = data.speed;
                                 ditem.avg_speed = data.avg_speed;
                                 ditem.time_used = data.time_used;
@@ -251,7 +316,35 @@
                     if (redata.status === 6) {
                         for (let i = 0; i < this.downloading.length; i++) {
                             let ditem = this.downloading[i];
-                            if (ditem.lastID === data.lastID) {
+                            if (ditem.lastID === data.LastID) {
+                                ditem.is_pause = true;
+                                ditem.avg_speed = "0KB";
+                                ditem.time_left = "--s";
+                                ditem.status = redata.status;
+                            }
+                        }
+                    }
+                    if (redata.status === 7) {
+                        for (let i = 0; i < this.downloading.length; i++) {
+                            let ditem = this.downloading[i];
+                            if (ditem.lastID === data.LastID) {
+                                ditem.is_pause = false;
+                                ditem.status = redata.status;
+                            }
+                        }
+                    }
+                    if (redata.status === 8) {
+                        for (let i = 0; i < this.downloading.length; i++) {
+                            let ditem = this.downloading[i];
+                            if (ditem.lastID === data.LastID) {
+                                this.downloading.splice(i, 1);
+                            }
+                        }
+                    }
+                    if (redata.status === 9) {
+                        for (let i = 0; i < this.downloading.length; i++) {
+                            let ditem = this.downloading[i];
+                            if (ditem.lastID === data.LastID) {
                                 this.downloaded.push({
                                     lastID: ditem.lastID,
                                     path: ditem.path,
@@ -271,7 +364,7 @@
                         }
                     }
                 }
-                console.log(redata);
+                // console.log(redata);
             },
             indexPendingDownloadList(path) {
                 for (let i = 0; i < this.pending_download.length; i++) {
@@ -288,6 +381,81 @@
                     }
                 }
             },
+            swichDownloadStatus(item) {
+                let method = "";
+                if (item.is_pause) {
+                    method = "resume";
+                } else {
+                    method = "pause";
+                }
+                axios.get(this.base_url + 'api/v1/download?method=' + method + '&id=' + item.lastID)
+                    .then(result => {
+                        if (result.data.code === 0) {
+                            this.$Message.success('操作成功');
+                        } else {
+                            this.$Message.error({
+                                content: result.data.msg,
+                                duration: 10,
+                                closable: true
+                            });
+                        }
+                    });
+            },
+            cancelTask(item) {
+                axios.get(this.base_url + 'api/v1/download?method=cancel&id=' + item.lastID)
+                    .then(result => {
+                        if (result.data.code === 0) {
+                            this.$Message.success('操作成功');
+                        } else {
+                            this.$Message.error({
+                                content: result.data.msg,
+                                duration: 10,
+                                closable: true
+                            });
+                        }
+                    });
+            },
+            bytesToSize(bytes) {
+                if (bytes === 0) return '0 B';
+                var k = 1000, // or 1024
+                    sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+                    i = Math.floor(Math.log(bytes) / Math.log(k));
+
+                return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+            },
+            getTaskStatus(id) {
+                axios.get(this.base_url + 'api/v1/download?method=status&id=' + id)
+                    .then(result => {
+                        if (result.data.code === 0) {
+                            this.taskDetail = [];
+                            let details = result.data.data;
+                            for (let i = 0; i < details.length; i++) {
+                                let error = "";
+                                if (details[i].error !== "<nil>")
+                                    error = details[i].error;
+                                this.taskDetail.push({
+                                    id: details[i].id,
+                                    status: details[i].status,
+                                    speed: this.bytesToSize(details[i].speed),
+                                    error: error,
+                                })
+                            }
+                            if (this.modalDetailFlag) {
+                                setTimeout(() => this.getTaskStatus(id), 1000);
+                            }
+                        } else {
+                            this.$Message.error({
+                                content: result.data.msg,
+                                duration: 10,
+                                closable: true
+                            });
+                        }
+                    });
+            },
+            detailTask(item) {
+                this.getTaskStatus(item.lastID);
+                this.modalDetailFlag = true;
+            }
         },
         mounted() {
             this.initWebSocket()

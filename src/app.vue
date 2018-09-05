@@ -76,7 +76,7 @@
                         </FormItem>
                     </Form>
                 </Modal>
-                <Modal v-model="modalShareFlag" :width="800" cancel-text="">
+                <Modal v-model="modalShareFlag" :width="800">
                     <share_component :global_data="globalData"></share_component>
                     <div slot="footer">
                         <Button type="info" @click="modalShareFlag = false">确认</Button>
