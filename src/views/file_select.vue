@@ -37,12 +37,12 @@
 
 <script>
     import axios from 'axios'
-
+    import pcsConfig from '../config/pcsconfig.js'
     export default {
         name: "file_select",
         data() {
             return {
-                base_url: 'http://127.0.0.1:8081/',
+                base_url: pcsConfig.base_url,
                 checkAll: false,
                 indeterminate: false,
                 fileData: [],

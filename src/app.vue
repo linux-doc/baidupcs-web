@@ -93,10 +93,11 @@
     import file_manager_component from './views/file_manager'
     import download_component from './views/download'
     import share_component from './views/share'
+    import pcsConfig from './config/pcsconfig.js'
     export default {
         data () {
             return {
-                base_url: 'http://127.0.0.1:8081/',
+                base_url: pcsConfig.base_url,
                 login_flag: false,
                 select_menu_name: "1",
                 baidu_name: "",

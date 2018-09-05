@@ -40,13 +40,13 @@
 
 <script>
     import defConfig from '../config/particles_config.js'
-
+    import pcsConfig from '../config/pcsconfig.js'
     export default {
         name: "login",
         data() {
             return {
-                base_url: 'http://127.0.0.1:8081/',
-                ws_url: 'ws://127.0.0.1:8081/ws',
+                base_url: pcsConfig.base_url,
+                ws_url: pcsConfig.ws_url,
                 login_status: 1,
                 username: '',
                 password: '',

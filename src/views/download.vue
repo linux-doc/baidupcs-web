@@ -51,14 +51,15 @@
 
 <script>
     import ProcessItemComponent from "./process_item";
+    import pcsConfig from '../config/pcsconfig.js'
     export default {
         name: "download",
         components: {ProcessItemComponent},
         data() {
             return {
                 select_menu_name: "1-1",
-                base_url: 'http://127.0.0.1:8081/',
-                ws_url: 'ws://127.0.0.1:8081/ws',
+                base_url: pcsConfig.base_url,
+                ws_url: pcsConfig.ws_url,
                 websocket: null,
                 modalDetailFlag: false,
                 pending_download: [],

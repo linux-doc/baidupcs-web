@@ -131,13 +131,13 @@
 <script>
     import axios from 'axios'
     import FileSelectComponent from './file_select'
-
+    import pcsConfig from '../config/pcsconfig.js'
     export default {
         name: "file_manager",
         data() {
             return {
                 spin_show: false,
-                base_url: 'http://127.0.0.1:8081/',
+                base_url: pcsConfig.base_url,
                 folders: [
                     {
                         title: '主目录',
