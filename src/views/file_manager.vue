@@ -329,6 +329,8 @@
                     onOk: () => {
                         this.addItemToClipboard('remove');
                         this.pasteClipboard(false);
+                        this.checkGroup = [];
+                        this.indeterminate = false;
                     }
                 });
             },
@@ -351,7 +353,6 @@
                 var cur_dir = "/" + this.bread_item.join('/');
                 this.global_data.pending_upload_data.push(cur_dir);
                 this.global_data.send_upload_signal = 1;
-                this.$Message.success('已经添加到上传队列!');
                 this.modalFlag = false;
             },
             downloadFiles() {
