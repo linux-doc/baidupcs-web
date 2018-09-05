@@ -164,19 +164,6 @@
                     //     path: "./kanong",
                     //     is_pause: true,
                     //     status: 1,
-                    // },
-                    // {
-                    //     lastID: 2,
-                    //     download_size: "585.94KB",
-                    //     total_size: "18.43MB",
-                    //     speed: "5.37KB",
-                    //     time_used: "1s",
-                    //     time_left: "56m46s",
-                    //     percent: 0.03,
-                    //     name: "kanong",
-                    //     path: "./kanong",
-                    //     is_pause: false,
-                    //     status: 1,
                     // }
                 ],
                 downloaded: []
@@ -301,7 +288,7 @@
                     if (redata.status === 5) {
                         for (let i = 0; i < this.downloading.length; i++) {
                             let ditem = this.downloading[i];
-                            if (ditem.lastID === data.LastID) {
+                            if (ditem.lastID === data.LastID && !ditem.is_pause) {
                                 ditem.speed = data.speed;
                                 ditem.avg_speed = data.avg_speed;
                                 ditem.time_used = data.time_used;
@@ -318,6 +305,7 @@
                             let ditem = this.downloading[i];
                             if (ditem.lastID === data.LastID) {
                                 ditem.is_pause = true;
+                                ditem.speed = "0KB";
                                 ditem.avg_speed = "0KB";
                                 ditem.time_left = "--s";
                                 ditem.status = redata.status;

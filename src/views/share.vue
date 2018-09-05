@@ -56,16 +56,21 @@
                             let shares = result.data.data;
                             for (let i = 0; i < shares.length; i++) {
                                 let name = shares[i].typicalPath.split('/');
+                                name = name[name.length - 1];
+                                let multi = "";
+                                if (shares[i].fsIds.length > 1) {
+                                    multi = ' 等';
+                                }
                                 this.shareData.push({
                                     id: shares[i].shareId,
-                                    name: name[name.length - 1],
+                                    name: name + multi,
                                     password: (function () {
                                         if (shares[i].passwd === "")
                                             return "无";
                                         return shares[i].passwd;
                                     })(),
                                     link: shares[i].shortlink,
-                                    isDir: this.guessDirType(name[name.length - 1]),
+                                    isDir: this.guessDirType(name),
                                     path: shares[i].typicalPath,
                                     isDel: shares[i].typicalPath === '分享的文件已被删除' || shares[i].typicalPath === '分享已过期'
                                 });
