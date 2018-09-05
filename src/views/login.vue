@@ -90,41 +90,45 @@
                     });
                 }
                 if (redata.type === 1) {
-                    if (redata.status === 2) {
-                        this.verify_types = JSON.parse(redata.data);
-                        this.show_verify_types = true;
-                        this.show_verify_code = false;
-                        this.verify_img = '';
-                        this.verify_code = '';
+                    switch (redata.status) {
+                        case 2: //需要验证手机或邮箱
+                            this.verify_types = JSON.parse(redata.data);
+                            this.show_verify_types = true;
+                            this.show_verify_code = false;
+                            this.verify_img = '';
+                            this.verify_code = '';
+                            break;
+                        case 3: //发送验证码
+                            this.show_verify_code = true;
+                            this.$Message.success({
+                                content: '验证码已发送',
+                                duration: 10,
+                                closable: true
+                            });
+                            break;
+                        case 4: //验证码错误
+                            this.$Message.error({
+                                content: '验证码错误',
+                                duration: 10,
+                                closable: true
+                            });
+                            break;
+                        case 5: //账号或密码错误
+                            this.$Message.error({
+                                content: '账号或者密码错误',
+                                duration: 10,
+                                closable: true
+                            });
+                            break;
+                        case 6: //使用图片验证码
+                            this.verify_img = redata.msg;
+                            this.show_verify_code = true;
+                            break;
+                        case 7: //登录成功
+                            location.reload();
+                            break;
                     }
-                    if (redata.status === 3) {
-                        this.show_verify_code = true;
-                        this.$Message.success({
-                            content: '验证码已发送',
-                            duration: 10,
-                            closable: true
-                        });
-                    }
-                    if (redata.status === 4)
-                        this.$Message.error({
-                            content: '验证码错误',
-                            duration: 10,
-                            closable: true
-                        });
-                    if (redata.status === 5)
-                        this.$Message.error({
-                            content: '账号或者密码错误',
-                            duration: 10,
-                            closable: true
-                        });
-                    if (redata.status === 6) {
-                        this.verify_img = redata.img_url;
-                        this.show_verify_code = true;
-                    }
-                    if (redata.status === 7)
-                        location.reload()
                 }
-                console.log(redata);
             },
             websocketsend() {//数据发送
                 this.button_loading = true;
