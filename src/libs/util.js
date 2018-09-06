@@ -2,7 +2,7 @@ let util = {
 
 };
 util.title = function (title) {
-    title = title ? title + ' - Home' : 'iView project';
+    title = title ? title + ' - Home' : 'baidupcs-web';
     window.document.title = title;
 };
 
