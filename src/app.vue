@@ -58,23 +58,25 @@
                 <download_component :global_data="globalData"
                                     v-show='select_menu_name === "2"'/>
                 <Modal v-model="modalSettingFlag" @on-ok="updateSetting">
-                    <Row type="flex" justify="center" align="middle" v-if="quota_data.flag">
-                        <Col span="5">
-                            <p style="font-size: 16px">百度云存储</p>
-                        </Col>
-                        <Col span="5">
-                            <Circle :percent="quota_data.data.percent" :size="80">
-                                <span style="font-size:16px">{{quota_data.data.percent}}%</span>
-                                <div style="font-size:10px">还剩 {{quota_data.data.un_used}}</div>
-                            </Circle>
-                        </Col>
-                    </Row>
-                    <Form style="margin-top: 16px" ref="settingForm" :model="formData" :label-width="110">
-                        <FormItem :label="item.name" v-for="item in formData.config">
-                            <Input v-model="item.value"></Input>
-                            <p>{{item.desc}}</p>
-                        </FormItem>
-                    </Form>
+                    <div style="height: 68vh; overflow: auto;">
+                        <Row type="flex" justify="center" align="middle" v-if="quota_data.flag">
+                            <Col span="5">
+                                <p style="font-size: 16px">百度云存储</p>
+                            </Col>
+                            <Col span="5">
+                                <Circle :percent="quota_data.data.percent" :size="80">
+                                    <span style="font-size:16px">{{quota_data.data.percent}}%</span>
+                                    <div style="font-size:10px">还剩 {{quota_data.data.un_used}}</div>
+                                </Circle>
+                            </Col>
+                        </Row>
+                        <Form style="margin-top: 16px" ref="settingForm" :model="formData" :label-width="110">
+                            <FormItem :label="item.name" v-for="item in formData.config">
+                                <Input v-model="item.value"></Input>
+                                <p>{{item.desc}}</p>
+                            </FormItem>
+                        </Form>
+                    </div>
                 </Modal>
                 <Modal v-model="modalShareFlag" :width="800">
                     <share_component :global_data="globalData"></share_component>

@@ -27,10 +27,10 @@
                 <span v-if="itype == 2 && istatus == 1">等待上传...</span>
             </p>
             <Row v-if="istatus != 3">
-                <Col span="12">
+                <Col span="11">
                     <Progress :percent="item.percent" status="active"/>
                 </Col>
-                <Col span="2" v-if="itype == 1 && istatus == 2">
+                <Col span="3" v-if="itype == 1 && istatus == 2">
                     <Button size="small" type="warning" ghost v-if="!item.is_pause"
                             @click="swichDownloadStatus(item)">
                         <Icon type="md-pause"></Icon>
@@ -46,19 +46,7 @@
                         <Icon type="md-barcode"></Icon>
                     </Button>
                 </Col>
-                <Col span="10" v-if="itype == 1 && istatus == 2">
-                    <p>
-                        速度: {{item.speed}}/s
-                        <Divider type="vertical"/>
-                        <span v-if="itype == 1">已经下载: {{item.download_size}}</span>
-                        <span v-if="itype == 2">已经上传: {{item.uploaded_size}}</span>
-                        <Divider type="vertical"/>
-                        已用时间: {{item.time_used}}
-                        <Divider type="vertical"/>
-                        预计还需: {{item.time_left}}
-                    </p>
-                </Col>
-                <Col span="10" offset="2" v-if="itype == 2 || (itype == 1 && istatus == 1)">
+                <Col span="10">
                     <p>
                         速度: {{item.speed}}/s
                         <Divider type="vertical"/>

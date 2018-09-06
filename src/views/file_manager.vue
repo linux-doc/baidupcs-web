@@ -28,7 +28,7 @@
                     :style="{position: 'relative', padding: '24px', overflow: 'hidden', minHeight: '280px', background: '#fff'}">
                 <Spin size="large" fix v-if="spin_show"></Spin>
                 <Row :gutter="16">
-                    <Col span="4">
+                    <Col span="6">
                         <Checkbox
                                 :indeterminate="indeterminate"
                                 :value="checkAll"
@@ -52,7 +52,7 @@
                             </DropdownMenu>
                         </Dropdown>
                     </Col>
-                    <Col span="12" offset="8" style="text-align: right;">
+                    <Col span="18" style="text-align: right;">
                         <ButtonGroup>
                             <Button @click="addItemToClipboard('copy')">
                                 <Icon type="md-copy"></Icon>
@@ -103,22 +103,22 @@
                         </Card>
                         <div v-show="files_view_mode === 2">
                             <Row style="margin-bottom: 10px">
-                                <Col span="17" offset="1">文件名</Col>
+                                <Col span="15" offset="1">文件名</Col>
                                 <Col span="3">大小</Col>
-                                <Col span="3">修改时间</Col>
+                                <Col span="5">修改时间</Col>
                             </Row>
                             <Row class="file_list" @dblclick.native="DClickFolder(item)"
                                  v-for="item in current_folders">
                                 <Col span="1">
                                     <Checkbox :label="item.path"><span></span></Checkbox>
                                 </Col>
-                                <Col span="17" style="overflow: hidden;white-space: nowrap;">
+                                <Col span="15" style="overflow: hidden;white-space: nowrap;">
                                     <Icon type="ios-folder-outline" size="24" v-if="item.isdir"/>
                                     <Icon type="ios-document" size="24" v-if="!item.isdir"/>
                                     {{item.title}}
                                 </Col>
                                 <Col span="3"> {{item.size}}</Col>
-                                <Col span="3"> {{item.mtime}}</Col>
+                                <Col span="5"> {{item.mtime}}</Col>
                             </Row>
                         </div>
                     </CheckboxGroup>
@@ -219,10 +219,14 @@
                         func(Data);
                     });
             },
-            setCurrentFolder(data) {
-                this.current_folders = data;
+            resetCheckGroup() {
+                this.checkAll = false;
                 this.checkGroup = [];
                 this.indeterminate = false;
+            },
+            setCurrentFolder(data) {
+                this.current_folders = data;
+                this.resetCheckGroup();
             },
             setBreadPath(path) {
                 this.bread_item = path.split("/");
@@ -329,8 +333,7 @@
                     onOk: () => {
                         this.addItemToClipboard('remove');
                         this.pasteClipboard(false);
-                        this.checkGroup = [];
-                        this.indeterminate = false;
+                        this.resetCheckGroup();
                     }
                 });
             },
@@ -364,8 +367,7 @@
                 }
                 this.global_data.send_download_signal = true;
                 this.$Message.success('已经添加到下载队列!');
-                this.checkGroup = [];
-                this.indeterminate = false;
+                this.resetCheckGroup();
             },
             shareFiles() {
                 if (this.addItemToClipboard('') === false) {
@@ -383,8 +385,7 @@
                                 content: '分享成功, 链接: ' + result.data.msg,
                                 duration: 10
                             });
-                            this.checkGroup = [];
-                            this.indeterminate = false;
+                            this.resetCheckGroup();
                             this.global_data.share_refresh = true;
                         } else {
                             this.$Message.error({
@@ -512,13 +513,5 @@
     .file_list:hover {
         box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
         border-color: #eee;
-    }
-
-    .spin-container {
-        display: inline-block;
-        width: 100%;
-        height: 100%;
-        position: relative;
-        border: 1px solid #eee;
     }
 </style>
