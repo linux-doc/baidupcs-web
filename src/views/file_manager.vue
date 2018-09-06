@@ -27,8 +27,8 @@
             <Content
                     :style="{position: 'relative', padding: '24px', overflow: 'hidden', minHeight: '280px', background: '#fff'}">
                 <Spin size="large" fix v-if="spin_show"></Spin>
-                <Row :gutter="16">
-                    <Col span="6">
+                <Row :gutter="12">
+                    <Col span="7">
                         <Checkbox
                                 :indeterminate="indeterminate"
                                 :value="checkAll"
@@ -38,7 +38,7 @@
                             <Icon type="md-reorder" size="24" v-if="files_view_mode === 1"></Icon>
                             <Icon type="md-apps" size="24" v-if="files_view_mode === 2"></Icon>
                         </Button>
-                        <Dropdown @on-click="fileSort">
+                        <Dropdown @on-click="fileSort" style="margin-right: 16px;">
                             <a href="javascript:void(0)">
                                 <Icon type="md-swap" size="24"></Icon>
                             </a>
@@ -51,8 +51,11 @@
                                 <DropdownItem name="time-desc">时间 - 降序</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
+
+                        <Input v-model="searchKey" @on-search="searchKeyword" suffix="ios-search" search clearable
+                               placeholder="在当前文件夹下搜索..." style="width: auto"/>
                     </Col>
-                    <Col span="18" style="text-align: right;">
+                    <Col span="17" style="text-align: right;">
                         <ButtonGroup>
                             <Button @click="addItemToClipboard('copy')">
                                 <Icon type="md-copy"></Icon>
@@ -112,10 +115,18 @@
                                 <Col span="1">
                                     <Checkbox :label="item.path"><span></span></Checkbox>
                                 </Col>
-                                <Col span="15" style="overflow: hidden;white-space: nowrap;">
+                                <Col span="13" style="overflow: hidden;white-space: nowrap;">
                                     <Icon type="ios-folder-outline" size="24" v-if="item.isdir"/>
                                     <Icon type="ios-document" size="24" v-if="!item.isdir"/>
                                     {{item.title}}
+                                </Col>
+                                <Col span="2">
+                                    <Button @click="jumpToFolder(item.folder)" v-if="item.folder" type="success"
+                                            size="small" ghost>
+                                        <Icon type="ios-redo"/>
+                                        目录
+                                    </Button>
+                                    <span v-if="!item.folder">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span>
                                 </Col>
                                 <Col span="3"> {{item.size}}</Col>
                                 <Col span="5"> {{item.mtime}}</Col>
@@ -156,7 +167,8 @@
                 checkAll: false,
                 indeterminate: false,
                 new_folder_name: "",
-                modalFlag: false
+                modalFlag: false,
+                searchKey: ""
             }
         },
         components: {FileSelectComponent},
@@ -353,7 +365,7 @@
                 }
             },
             confirmUpload() {
-                var cur_dir = "/" + this.bread_item.join('/');
+                let cur_dir = "/" + this.bread_item.join('/');
                 this.global_data.pending_upload_data.push(cur_dir);
                 this.global_data.send_upload_signal = 1;
                 this.modalFlag = false;
@@ -440,6 +452,39 @@
                 } else {
                     this.files_view_mode = 1;
                 }
+            },
+            searchKeyword() {
+                if (this.searchKey === "") {
+                    this.$Message.warning('请输入搜索关键字');
+                    return;
+                }
+
+                this.spin_show = true;
+                let cur_dir = "/" + this.bread_item.join('/');
+                axios.get(this.base_url + 'api/v1/search?tpath=' + encodeURIComponent(cur_dir) + '&keyword=' + this.searchKey)
+                    .then(result => {
+                        this.spin_show = false;
+                        const fdata = result.data.data;
+                        let Data = [];
+                        for (var i = 0; i < fdata.length; i++) {
+                            var fd = fdata[i];
+                            let folder = fd.Path.substring(0, fd.Path.lastIndexOf('/'));
+                            Data.push({
+                                path: fd.Path,
+                                title: fd.Filename,
+                                folder: folder,
+                                isdir: false,
+                                size: this.bytesToSize(fd.Size),
+                                mtime: this.formatDateTime(fd.Mtime * 1000),
+                                ctime: this.formatDateTime(fd.Ctime * 1000),
+                            });
+                        }
+                        this.setCurrentFolder(Data);
+                    });
+            },
+            jumpToFolder(folder) {
+                this.getPathData(folder, this.setCurrentFolder);
+                this.setBreadPath(folder);
             }
         },
         mounted() {
