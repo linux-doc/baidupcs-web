@@ -21,37 +21,93 @@
                 </Submenu>
                 <Submenu name="3">
                     <template slot="title">
-                        <Icon type="ios-keypad"></Icon>
+                        <Icon type="ios-link" />
                         离线下载
                     </template>
-                    <MenuItem name="3-1">TODO</MenuItem>
-                    <MenuItem name="3-2">TODO</MenuItem>
+                    <MenuItem name="3-1">正在下载</MenuItem>
+                    <MenuItem name="3-2">已经完成</MenuItem>
                 </Submenu>
             </Menu>
         </Sider>
         <Layout :style="{padding: '0 24px 24px'}">
             <!--下载相关-->
             <ProcessItemComponent :items="downloading" itype="1" istatus="2"
-                                  v-if="select_menu_name === '1-1'"></ProcessItemComponent>
+                                  v-show="select_menu_name === '1-1'"></ProcessItemComponent>
             <ProcessItemComponent :items="pending_download" itype="1" istatus="1"
-                                  v-if="select_menu_name === '1-1'"></ProcessItemComponent>
+                                  v-show="select_menu_name === '1-1'"></ProcessItemComponent>
             <ProcessItemComponent :items="downloaded" itype="1" istatus="3"
-                                  v-if="select_menu_name === '1-2'"></ProcessItemComponent>
+                                  v-show="select_menu_name === '1-2'"></ProcessItemComponent>
 
             <!--上传相关-->
             <ProcessItemComponent :items="uploading" itype="2" istatus="2"
-                                  v-if="select_menu_name === '2-1'"></ProcessItemComponent>
+                                  v-show="select_menu_name === '2-1'"></ProcessItemComponent>
             <ProcessItemComponent :items="pending_upload" itype="2" istatus="1"
-                                  v-if="select_menu_name === '2-1'"></ProcessItemComponent>
+                                  v-show="select_menu_name === '2-1'"></ProcessItemComponent>
             <ProcessItemComponent :items="uploaded" itype="2" istatus="3"
-                                  v-if="select_menu_name === '2-2'"></ProcessItemComponent>
+                                  v-show="select_menu_name === '2-2'"></ProcessItemComponent>
+            <div v-show="select_menu_name === '3-1'">
+                <Card :bordered="false" style="margin-top: 16px">
+                    <Row>
+                        <Col span="6">任务名</Col>
+                        <Col span="2">大小</Col>
+                        <Col span="7">进度</Col>
+                        <Col span="3">任务状态</Col>
+                        <Col span="4">开始时间</Col>
+                        <Col span="2">操作</Col>
+                    </Row>
+                </Card>
+                <Card :bordered="false" style="margin-top: 2px" v-for="item in offline_downloading">
+                    <Row>
+                        <Col span="6" style="overflow: hidden;white-space: nowrap;">
+                            {{item.taskname}}
+                        </Col>
+                        <Col span="2">{{item.file_size}}</Col>
+                        <Col span="7">
+                            <Progress :percent="item.percent" status="active"/>
+                        </Col>
+                        <Col span="3">{{item.status_text}}</Col>
+                        <Col span="4">{{item.stime}}</Col>
+                        <Col span="2">
+                            <Button icon="md-close" type="error" size="small" ghost @click="deleteTask(item)"></Button>
+                        </Col>
+                    </Row>
+                </Card>
+            </div>
+            <div v-show="select_menu_name === '3-2'">
+                <Card :bordered="false" style="margin-top: 16px">
+                    <Row>
+                        <Col span="6">任务名</Col>
+                        <Col span="2">任务状态</Col>
+                        <Col span="2">大小</Col>
+                        <Col span="8">路径</Col>
+                        <Col span="4">完成时间</Col>
+                        <Col span="2">操作</Col>
+                    </Row>
+                </Card>
+                <Card :bordered="false" style="margin-top: 2px" v-for="item in offline_downloaded">
+                    <Row>
+                        <Col span="6" style="overflow: hidden;white-space: nowrap;">
+                            {{item.taskname}}
+                        </Col>
+                        <Col span="2">{{item.status_text}}</Col>
+                        <Col span="2">{{item.file_size}}</Col>
+                        <Col span="8" style="overflow: hidden;white-space: nowrap;">{{item.path}}</Col>
+                        <Col span="4">{{item.ftime}}</Col>
+                        <Col span="2">
+                            <Button icon="md-close" type="error" size="small" ghost @click="deleteTask(item)"></Button>
+                        </Col>
+                    </Row>
+                </Card>
+            </div>
         </Layout>
     </Layout>
 </template>
 
 <script>
-    import ProcessItemComponent from "./process_item";
+    import ProcessItemComponent from "./download_process_item";
     import pcsConfig from '../config/pcsconfig.js'
+    import axios from 'axios'
+    import utils from '../libs/util'
     export default {
         name: "download",
         components: {ProcessItemComponent},
@@ -81,7 +137,9 @@
                 downloaded: [],
                 pending_upload: [],
                 uploading: [],
-                uploaded: []
+                uploaded: [],
+                offline_downloaded: [],
+                offline_downloading: []
             }
         },
         props: ['global_data'],
@@ -170,6 +228,9 @@
         methods: {
             getMenuName(name) {
                 this.select_menu_name = name;
+                if (name === '3-1' || name === '3-2') {
+                    this.getOfflineTask();
+                }
             },
             initWebSocket() { //初始化websocket
                 this.websocket = new WebSocket(this.ws_url);
@@ -397,6 +458,78 @@
                     }
                 }
             },
+            deleteTask(item) {
+                let method = "delete";
+                if (item.status !== 0){
+                    method = "cancel";
+                }
+                axios.get(this.base_url + 'api/v1/offline_download?method=' + method + '&id=' + item.taskid)
+                    .then(result => {
+                        if (result.data.code === 0) {
+                            this.$Message.success("删除成功");
+                            this.getOfflineTask();
+                        } else {
+                            this.$Message.error({
+                                content: result.data.msg,
+                                duration: 10,
+                                closable: true
+                            });
+                        }
+                    });
+            },
+            getOfflineTask() {
+                axios.get(this.base_url + 'api/v1/offline_download?method=list')
+                    .then(result => {
+                        if (result.data.code === 0) {
+                            const fdata = result.data.data;
+                            let finishedData = [];
+                            let downloadingData = [];
+                            for (var i = 0; i < fdata.length; i++) {
+                                var fd = fdata[i];
+                                if (fd.Status === 0){
+                                    finishedData.push({
+                                        taskid: fd.TaskID,
+                                        taskname: fd.TaskName,
+                                        status: fd.Status,
+                                        status_text: fd.StatusText,
+                                        file_size: utils.bytesToSize(fd.FileSize),
+                                        finished_size: utils.bytesToSize(fd.FinishedSize),
+                                        ftime: utils.formatDateTime(fd.FinishTime * 1000),
+                                        path: fd.SavePath,
+                                        url: fd.SourceURL,
+                                        type: fd.OdType,
+                                    });
+                                } else {
+                                    let percent = ((fd.FinishedSize*1) / (fd.FileSize*1) * 100).toFixed(2);
+                                    downloadingData.push({
+                                        taskid: fd.TaskID,
+                                        taskname: fd.TaskName,
+                                        status: fd.Status,
+                                        status_text: fd.StatusText,
+                                        file_size: utils.bytesToSize(fd.FileSize),
+                                        finished_size: utils.bytesToSize(fd.FinishedSize),
+                                        percent: percent * 1,
+                                        stime: utils.formatDateTime(fd.StartTime * 1000),
+                                        path: fd.SavePath,
+                                        url: fd.SourceURL,
+                                        type: fd.OdType,
+                                    });
+                                }
+                            }
+                            this.offline_downloaded = finishedData;
+                            this.offline_downloading = downloadingData;
+                            if (downloadingData.length > 0) {
+                                setTimeout(() => this.getOfflineTask(), 1000);
+                            }
+                        } else {
+                            this.$Message.error({
+                                content: result.data.msg,
+                                duration: 10,
+                                closable: true
+                            });
+                        }
+                    });
+            }
         },
         mounted() {
             this.initWebSocket()
