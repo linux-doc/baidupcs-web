@@ -54,6 +54,10 @@
 
                         <Input v-model="searchKey" @on-search="searchKeyword" suffix="ios-search" search clearable
                                placeholder="在当前文件夹下搜索..." style="width: auto"/>
+                        <Button style="margin-top: 8px" @click="offlineDownload">
+                            <Icon type="md-link"></Icon>
+                            离线下载
+                        </Button>
                     </Col>
                     <Col span="17" style="text-align: right;">
                         <ButtonGroup>
@@ -143,6 +147,7 @@
     import axios from 'axios'
     import FileSelectComponent from './file_select'
     import pcsConfig from '../config/pcsconfig.js'
+    import utils from '../libs/util'
     export default {
         name: "file_manager",
         data() {
@@ -168,35 +173,13 @@
                 indeterminate: false,
                 new_folder_name: "",
                 modalFlag: false,
-                searchKey: ""
+                searchKey: "",
+                downloadLink: "",
             }
         },
         components: {FileSelectComponent},
         props: ['global_data'],
         methods: {
-            formatDateTime(inputTime) {
-                var date = new Date(inputTime);
-                var y = date.getFullYear();
-                var m = date.getMonth() + 1;
-                m = m < 10 ? ('0' + m) : m;
-                var d = date.getDate();
-                d = d < 10 ? ('0' + d) : d;
-                var h = date.getHours();
-                h = h < 10 ? ('0' + h) : h;
-                var minute = date.getMinutes();
-                var second = date.getSeconds();
-                minute = minute < 10 ? ('0' + minute) : minute;
-                second = second < 10 ? ('0' + second) : second;
-                return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
-            },
-            bytesToSize(bytes) {
-                if (bytes === 0) return '0 B';
-                var k = 1000, // or 1024
-                    sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-                    i = Math.floor(Math.log(bytes) / Math.log(k));
-
-                return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
-            },
             getPathData(path, func, only_folder = false, orderby = 'name', order = 'asc') {
                 this.spin_show = true;
                 var Data = [];
@@ -211,9 +194,9 @@
                                     path: fd.path,
                                     title: fd.server_filename,
                                     isdir: true,
-                                    size: this.bytesToSize(fd.size),
-                                    mtime: this.formatDateTime(fd.server_mtime * 1000),
-                                    ctime: this.formatDateTime(fd.server_ctime * 1000),
+                                    size: utils.bytesToSize(fd.size),
+                                    mtime: utils.formatDateTime(fd.server_mtime * 1000),
+                                    ctime: utils.formatDateTime(fd.server_ctime * 1000),
                                     loading: false,
                                     children: []
                                 });
@@ -221,9 +204,9 @@
                                 Data.push({
                                     path: fd.path,
                                     title: fd.server_filename,
-                                    size: this.bytesToSize(fd.size),
-                                    mtime: this.formatDateTime(fd.server_mtime * 1000),
-                                    ctime: this.formatDateTime(fd.server_ctime * 1000),
+                                    size: utils.bytesToSize(fd.size),
+                                    mtime: utils.formatDateTime(fd.server_mtime * 1000),
+                                    ctime: utils.formatDateTime(fd.server_ctime * 1000),
                                     isdir: false
                                 });
                             }
@@ -474,9 +457,9 @@
                                 title: fd.Filename,
                                 folder: folder,
                                 isdir: false,
-                                size: this.bytesToSize(fd.Size),
-                                mtime: this.formatDateTime(fd.Mtime * 1000),
-                                ctime: this.formatDateTime(fd.Ctime * 1000),
+                                size: utils.bytesToSize(fd.Size),
+                                mtime: utils.formatDateTime(fd.Mtime * 1000),
+                                ctime: utils.formatDateTime(fd.Ctime * 1000),
                             });
                         }
                         this.setCurrentFolder(Data);
@@ -485,6 +468,43 @@
             jumpToFolder(folder) {
                 this.getPathData(folder, this.setCurrentFolder);
                 this.setBreadPath(folder);
+            },
+            offlineDownload() {
+                this.$Modal.confirm({
+                    render: (h) => {
+                        return h('Input', {
+                            props: {
+                                value: this.downloadLink,
+                                autofocus: true,
+                                placeholder: '下载到百度云当前目录, 支持http/https/ftp/电驴/磁力链协议'
+                            },
+                            on: {
+                                input: (val) => {
+                                    this.downloadLink = val;
+                                }
+                            }
+                        })
+                    },
+                    loading: true,
+                    okText: '确认',
+                    cancelText: '取消',
+                    onOk: () => {
+                        let cur_dir = "/" + this.bread_item.join('/');
+                        axios.get(this.base_url + 'api/v1/offline_download?method=add&link=' + encodeURIComponent(this.downloadLink) + '&tpath=' + encodeURIComponent(cur_dir))
+                            .then(result => {
+                                this.$Modal.remove();
+                                this.downloadLink = "";
+                                if (result.data.code !== 0) {
+                                    this.$Message.error({
+                                        content: result.data.msg,
+                                        duration: 10
+                                    });
+                                } else {
+                                    this.$Message.success('任务添加成功, ID:' + result.data.msg);
+                                }
+                            });
+                    }
+                });
             }
         },
         mounted() {
@@ -502,9 +522,9 @@
                                 path: fd.path,
                                 title: fd.server_filename,
                                 isdir: true,
-                                size: this.bytesToSize(fd.size),
-                                mtime: this.formatDateTime(fd.server_mtime * 1000),
-                                ctime: this.formatDateTime(fd.server_ctime * 1000),
+                                size: utils.bytesToSize(fd.size),
+                                mtime: utils.formatDateTime(fd.server_mtime * 1000),
+                                ctime: utils.formatDateTime(fd.server_ctime * 1000),
                                 loading: false,
                                 children: []
                             });
@@ -512,9 +532,9 @@
                                 path: fd.path,
                                 title: fd.server_filename,
                                 isdir: true,
-                                size: this.bytesToSize(fd.size),
-                                mtime: this.formatDateTime(fd.server_mtime * 1000),
-                                ctime: this.formatDateTime(fd.server_ctime * 1000),
+                                size: utils.bytesToSize(fd.size),
+                                mtime: utils.formatDateTime(fd.server_mtime * 1000),
+                                ctime: utils.formatDateTime(fd.server_ctime * 1000),
                                 loading: false,
                                 children: []
                             });
@@ -523,9 +543,9 @@
                                 path: fd.path,
                                 title: fd.server_filename,
                                 isdir: false,
-                                size: this.bytesToSize(fd.size),
-                                mtime: this.formatDateTime(fd.server_mtime * 1000),
-                                ctime: this.formatDateTime(fd.server_ctime * 1000),
+                                size: utils.bytesToSize(fd.size),
+                                mtime: utils.formatDateTime(fd.server_mtime * 1000),
+                                ctime: utils.formatDateTime(fd.server_ctime * 1000),
                             });
                         }
                     }

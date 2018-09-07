@@ -80,6 +80,7 @@
 
 <script>
     import axios from 'axios'
+    import utils from '../libs/util'
     import pcsConfig from '../config/pcsconfig.js'
     export default {
         name: "process_item",
@@ -135,14 +136,6 @@
                     }
                 });
             },
-            bytesToSize(bytes) {
-                if (bytes === 0) return '0 B';
-                var k = 1000, // or 1024
-                    sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-                    i = Math.floor(Math.log(bytes) / Math.log(k));
-
-                return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
-            },
             getTaskStatus(id) {
                 axios.get(this.base_url + 'api/v1/download?method=status&id=' + id)
                     .then(result => {
@@ -156,7 +149,7 @@
                                 this.taskDetail.push({
                                     id: details[i].id,
                                     status: details[i].status,
-                                    speed: this.bytesToSize(details[i].speed),
+                                    speed: utils.bytesToSize(details[i].speed),
                                     error: error,
                                 })
                             }
