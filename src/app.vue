@@ -47,8 +47,9 @@
                                     <Icon type="md-person"/>
                                     {{baidu_name}}
                                 </template>
-                                <MenuItem name="4-1">设置</MenuItem>
-                                <MenuItem name="4-2">退出</MenuItem>
+                                <MenuItem name="4-1">简介</MenuItem>
+                                <MenuItem name="4-2">设置</MenuItem>
+                                <MenuItem name="4-3">退出</MenuItem>
                             </Submenu>
                         </div>
                     </Menu>
@@ -146,6 +147,17 @@
                     return;
                 }
                 if (name === "4-1") {
+                    this.$Modal.success({
+                        title: 'BaiduPCS-Go Web版本',
+                        content: `<i class="ivu-icon ivu-icon-ios-mail" style="font-size: 24px"></i> liuzhuoling2011@hotmail.com <br />
+                                  <i class="ivu-icon ivu-icon-logo-github" style="font-size: 24px"></i> <a href="https://github.com/liuzhuoling2011/baidupcs-web" target="_blank">https://github.com/liuzhuoling2011/baidupcs-web</a> <br />
+                                  <br />
+                                  感谢 iikira 提供了高速, 稳定可靠的百度云后台服务<br />
+                                  <i class="ivu-icon ivu-icon-logo-github" style="font-size: 24px"></i> <a href="https://github.com/iikira/BaiduPCS-Go" target="_blank">https://github.com/iikira/BaiduPCS-Go</a>`
+                    });
+                    return;
+                }
+                if (name === "4-2") {
                     axios.get(this.base_url + 'api/v1/quota')
                         .then(result => {
                             if (result.data.code === 0) {
@@ -163,7 +175,7 @@
                     this.modalSettingFlag = true;
                     return;
                 }
-                if (name === "4-2") {
+                if (name === "4-3") {
                     this.$Modal.confirm({
                         title: '退出登录',
                         okText: '确定',
