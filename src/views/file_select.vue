@@ -91,7 +91,7 @@
             getFileList(path) {
                 this.checkGroup = [];
                 this.indeterminate = false;
-                axios.get(this.base_url + 'api/v1/local_file?path=' + path)
+                axios.get(this.base_url + 'api/v1/local_file?method=list&path=' + encodeURIComponent(path))
                     .then(result => {
                         if (result.data.code === 0) {
                             this.fileData = result.data.data;

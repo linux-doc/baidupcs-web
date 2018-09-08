@@ -60,10 +60,10 @@
                 </Col>
             </Row>
             <Row v-if="istatus == 3">
-                <Col span="8">
+                <Col span="4">
                     <Progress :percent="item.percent" status="active"/>
                 </Col>
-                <Col span="16">
+                <Col span="20">
                     <p>
                         平均速度: {{item.avg_speed}}/s
                         <Divider type="vertical"/>
@@ -71,6 +71,10 @@
                         <Divider type="vertical"/>
                         保存<span v-if="itype == 1">本地</span><span v-if="itype == 2">云端</span>
                         路径: {{item.save_path}}
+                        <Divider type="vertical"/>
+                        <Button @click="openFolder(item.save_path)" v-if="itype == 1" type="success" size="small" ghost>
+                            <Icon type="ios-redo"/> 打开下载目录
+                        </Button>
                     </p>
                 </Col>
             </Row>
@@ -168,6 +172,18 @@
             detailTask(item) {
                 this.getTaskStatus(item.lastID);
                 this.modalDetailFlag = true;
+            },
+            openFolder(path) {
+                axios.get(this.base_url + 'api/v1/local_file?method=open_folder&path=' + encodeURIComponent(path))
+                    .then(result => {
+                        if (result.data.code !== 0) {
+                            this.$Message.error({
+                                content: result.data.msg,
+                                duration: 10,
+                                closable: true
+                            });
+                        }
+                    });
             }
         }
     }
