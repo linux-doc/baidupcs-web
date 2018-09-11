@@ -15,6 +15,7 @@
 ```./BaiduPCS-Go-xxx web --port 12345```
 
 Enjoy, 如果觉得好用, 请不要吝啬 ```star``` 或者 ```follow``` 哦, 或者顺便 ```buy me a coffee```
+
 |支付宝|微信|
 |:-----:|:-----:|
 |<img width="152" src="https://i.loli.net/2018/09/11/5b9762ccc140f.png">|<img width="150" src="https://i.loli.net/2018/09/11/5b9762ad8fcb3.png"/>|
