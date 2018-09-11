@@ -1,8 +1,3 @@
-.header {
-    background-image: url("../images/login-bg.jpg");
-    position: absolute;
-}
-
 html, body, #app, .layout, .ivu-layout {
     height: 100%;
 }

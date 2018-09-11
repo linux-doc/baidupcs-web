@@ -8,20 +8,16 @@
 
 腾讯视频: https://v.qq.com/x/page/e0774xoeatv.html
 
-## 安装
-```bush
-// install dependencies
-npm install
-```
 ## 运行
-### 开发环境
-```bush
-// For the first time, run init to create index.html
-npm run init
-npm run dev
-```
-### 生产环境(Build)
-```bush
-npm run build
-```
+程序已经打包好放在 [release](https://github.com/liuzhuoling2011/baidupcs-web/releases) 页面, 直接双击就可以使用
+如果遇到程序启动错误, 应该是端口占用导致的, 可以指定端口运行
 
+```./BaiduPCS-Go-xxx web --port 12345```
+
+Enjoy, 如果觉得好用, 请不要吝啬 ```star``` 或者 ```follow``` 哦, 或者顺便 ```buy me a coffee```
+<figure class="half">
+    支付宝
+    <img width="152" src="https://i.loli.net/2018/09/11/5b9762ccc140f.png">
+    微信
+    <img width="150" src="https://i.loli.net/2018/09/11/5b9762ad8fcb3.png"/>
+</figure>
