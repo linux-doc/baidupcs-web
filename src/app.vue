@@ -47,7 +47,7 @@
                             <Submenu name="4">
                                 <template slot="title">
                                     <Icon type="md-person"/>
-                                    分享管理分享管理分享管理分享管理分享管理{{baidu_name}}
+                                    {{baidu_name}}
                                 </template>
                                 <MenuItem name="4-1">简介</MenuItem>
                                 <MenuItem name="4-2">设置</MenuItem>
