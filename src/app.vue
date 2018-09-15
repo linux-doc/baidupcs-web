@@ -11,15 +11,17 @@
 
     .layout-logo {
         height: 100%;
-        border-radius: 3px;
-        float: left;
-        position: relative;
     }
 
-    .layout-nav {
-        width: 560px;
-        margin: 0 auto;
-        margin-right: 20px;
+    .ivu-menu-horizontal {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ivu-layout-header {
+        height: 60px;
+        line-height: 60px;
     }
 </style>
 <template>
@@ -45,7 +47,7 @@
                             <Submenu name="4">
                                 <template slot="title">
                                     <Icon type="md-person"/>
-                                    {{baidu_name}}
+                                    分享管理分享管理分享管理分享管理分享管理{{baidu_name}}
                                 </template>
                                 <MenuItem name="4-1">简介</MenuItem>
                                 <MenuItem name="4-2">设置</MenuItem>
