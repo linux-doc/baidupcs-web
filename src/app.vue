@@ -11,15 +11,17 @@
 
     .layout-logo {
         height: 100%;
-        border-radius: 3px;
-        float: left;
-        position: relative;
     }
 
-    .layout-nav {
-        width: 560px;
-        margin: 0 auto;
-        margin-right: 20px;
+    .ivu-menu-horizontal {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ivu-layout-header {
+        height: 60px;
+        line-height: 60px;
     }
 </style>
 <template>
