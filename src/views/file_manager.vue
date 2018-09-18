@@ -186,6 +186,13 @@
                 axios.get(this.base_url + 'api/v1/files?path=' + encodeURIComponent(path) + '&order_by=' + orderby + '&order=' + order)
                     .then(result => {
                         this.spin_show = false;
+                        if (result.data.hasOwnProperty('error_code')) {
+                            this.$Message.error({
+                                content: result.data.error_msg,
+                                duration: 10
+                            });
+                            return;
+                        }
                         const fdata = result.data.list;
                         for (var i = 0; i < fdata.length; i++) {
                             var fd = fdata[i];
@@ -514,6 +521,13 @@
             axios.get(this.base_url + 'api/v1/files?path=/')
                 .then(result => {
                     this.spin_show = false;
+                    if (result.data.hasOwnProperty('error_code')) {
+                        this.$Message.error({
+                            content: result.data.error_msg,
+                            duration: 10
+                        });
+                        return;
+                    }
                     const fdata = result.data.list;
                     for (var i = 0; i < fdata.length; i++) {
                         var fd = fdata[i];

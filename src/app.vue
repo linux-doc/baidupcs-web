@@ -61,7 +61,7 @@
                 <download_component :global_data="globalData"
                                     v-show='select_menu_name === "2"'/>
                 <Modal v-model="modalSettingFlag" @on-ok="updateSetting">
-                    <div style="height: 68vh; overflow: auto;">
+                    <div style="height: 72vh; overflow: auto;">
                         <Row type="flex" justify="center" align="middle" v-if="quota_data.flag">
                             <Col span="5">
                                 <p style="font-size: 16px">百度云存储</p>
@@ -171,7 +171,7 @@
                         .then(result => {
                             if (result.data.code === 0) {
                                 this.formData.config = result.data.data;
-                                this.formData.config.shift();
+                                // this.formData.config.shift();
                             }
                         });
                     this.modalSettingFlag = true;
