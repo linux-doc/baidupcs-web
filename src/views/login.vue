@@ -76,7 +76,10 @@
                 console.log("WebSocket连接成功");
             },
             websocketonerror(e) { //错误
-                console.log("WebSocket连接发生错误");
+                this.$Message.error({
+                    content: 'WebSocket连接发生错误 ' + e,
+                    duration: 10
+                });
             },
             websocketonmessage(e) { //数据接收
                 const redata = JSON.parse(e.data);
