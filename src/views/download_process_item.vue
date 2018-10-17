@@ -161,11 +161,12 @@
                                 setTimeout(() => this.getTaskStatus(id), 1000);
                             }
                         } else {
-                            this.$Message.error({
+                            this.$Message.info({
                                 content: result.data.msg,
                                 duration: 10,
                                 closable: true
                             });
+                            this.modalDetailFlag = false;
                         }
                     });
             },

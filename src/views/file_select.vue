@@ -23,10 +23,12 @@
                 <Col span="1">
                     <Checkbox :label="item.path"><span></span></Checkbox>
                 </Col>
-                <Col span="11" style="overflow-x: hidden;white-space: nowrap;">
-                    <Icon type="ios-folder-outline" size="24" v-if="item.isdir"/>
-                    <Icon type="ios-document" size="24" v-if="!item.isdir"/>
-                    {{item.name}}
+                <Col span="11">
+                    <div :title="item.name" style="overflow-x: hidden;text-overflow:ellipsis;white-space: nowrap;">
+                        <Icon type="ios-folder-outline" size="24" v-if="item.isdir"/>
+                        <Icon type="ios-document" size="24" v-if="!item.isdir"/>
+                        {{item.name}}
+                    </div>
                 </Col>
                 <Col span="4">{{item.size}}</Col>
                 <Col span="8">{{item.date.substr(0,19)}}</Col>

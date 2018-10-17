@@ -58,7 +58,7 @@
                 </Card>
                 <Card :bordered="false" style="margin-top: 2px" v-for="item in offline_downloading">
                     <Row>
-                        <Col span="6" style="overflow: hidden;white-space: nowrap;">
+                        <Col :title="item.taskname" span="6" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">
                             {{item.taskname}}
                         </Col>
                         <Col span="2">{{item.file_size}}</Col>
@@ -86,12 +86,12 @@
                 </Card>
                 <Card :bordered="false" style="margin-top: 2px" v-for="item in offline_downloaded">
                     <Row>
-                        <Col span="6" style="overflow: hidden;white-space: nowrap;">
+                        <Col :title="item.taskname" span="6" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">
                             {{item.taskname}}
                         </Col>
                         <Col span="2">{{item.status_text}}</Col>
                         <Col span="2">{{item.file_size}}</Col>
-                        <Col span="8" style="overflow: hidden;white-space: nowrap;">{{item.path}}</Col>
+                        <Col span="8" :title="item.path" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{{item.path}}</Col>
                         <Col span="4">{{item.ftime}}</Col>
                         <Col span="2">
                             <Button icon="md-close" type="error" size="small" ghost @click="deleteTask(item)"></Button>

@@ -49,9 +49,13 @@
                                     <Icon type="md-person"/>
                                     {{baidu_name}}
                                 </template>
-                                <MenuItem name="4-1">简介</MenuItem>
+                                <MenuItem name="4-1">简介~</MenuItem>
                                 <MenuItem name="4-2">设置</MenuItem>
-                                <MenuItem name="4-3">退出</MenuItem>
+                                <MenuItem name="4-3">
+                                    <Badge dot v-if="update_flag">更新</Badge>
+                                    <span v-if="!update_flag">更新</span>
+                                </MenuItem>
+                                <MenuItem name="4-4">退出</MenuItem>
                             </Submenu>
                         </div>
                     </Menu>
@@ -113,6 +117,9 @@
                 modalSettingFlag: false,
                 modalShareFlag: false,
                 formData: {config: []},
+                notices: [],
+                update_version: [],
+                update_flag: false,
                 globalData: {
                     pending_download_data: [],
                     send_download_signal: false,
@@ -137,6 +144,33 @@
                         content: '与服务器联系断开 ' + reason.toString(),
                         duration: 10
                     });
+                });
+            axios.get(this.base_url + 'api/v1/setting?method=update')
+                .then(result => {
+                    if (result.data.code === 0) {
+                        this.update_version = JSON.parse(result.data.data).data.filename;
+                        if (this.update_version.length > 1){
+                            this.update_flag = true;
+                        }
+                    }
+                });
+            axios.get(this.base_url + 'api/v1/setting?method=notice')
+                .then(result => {
+                    if (result.data.code === 0) {
+                        let storage = window.localStorage;
+                        let storage_key = "baidupcs_notice_time";
+                        this.notices = JSON.parse(result.data.data).data;
+                        for(let i = 0; i < this.notices.length; i++){
+                            if (storage[storage_key] == null || storage[storage_key] < this.notices[i].CreatedAt){
+                                storage.setItem(storage_key, this.notices[i].CreatedAt);
+                                this.$Notice.info({
+                                    top: 50,
+                                    duration: 10,
+                                    title: this.notices[i].Msg,
+                                })
+                            }
+                        }
+                    }
                 });
         },
         beforeDestroy () {
@@ -178,6 +212,22 @@
                     return;
                 }
                 if (name === "4-3") {
+                    let version = "";
+                    for(let i = 1; i < this.update_version.length; i++){
+                        let url = 'http://' + this.update_version[i];
+                        version += '<a href="' + url + '">' + url + '</a><br />'
+                    }
+                    if (version === ""){
+                        version = "您目前使用的版本是最新的, 无需更新!"
+                    }
+                    this.$Modal.info({
+                        width: 600,
+                        title: "可以升级的版本如下, 下载后请替换本程序",
+                        content: version
+                    });
+                    return;
+                }
+                if (name === "4-4") {
                     this.$Modal.confirm({
                         title: '退出登录',
                         okText: '确定',

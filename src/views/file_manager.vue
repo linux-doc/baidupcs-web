@@ -106,7 +106,7 @@
                             </Checkbox>
                             <Icon type="ios-folder-outline" size="32" v-if="item.isdir"/>
                             <Icon type="ios-document" size="32" v-if="!item.isdir"/>
-                            <p style="overflow: hidden;">{{item.title}}</p>
+                            <p :title="item.title" style="overflow: hidden;">{{item.title}}</p>
                         </Card>
                         <div v-show="files_view_mode === 2">
                             <Row style="margin-bottom: 10px">
@@ -119,10 +119,12 @@
                                 <Col span="1">
                                     <Checkbox :label="item.path"><span></span></Checkbox>
                                 </Col>
-                                <Col span="13" style="overflow: hidden;white-space: nowrap;">
-                                    <Icon type="ios-folder-outline" size="24" v-if="item.isdir"/>
-                                    <Icon type="ios-document" size="24" v-if="!item.isdir"/>
-                                    {{item.title}}
+                                <Col span="13">
+                                    <div :title="item.title" style="overflow-x: hidden;text-overflow:ellipsis;white-space: nowrap;">
+                                        <Icon type="ios-folder-outline" size="24" v-if="item.isdir"/>
+                                        <Icon type="ios-document" size="24" v-if="!item.isdir"/>
+                                        {{item.title}}
+                                    </div>
                                 </Col>
                                 <Col span="2">
                                     <Button @click="jumpToFolder(item.folder)" v-if="item.folder" type="success"
@@ -306,6 +308,10 @@
 
                 this.clipboard = this.checkGroup.slice();
                 this.clipboard_method = method;
+                let msg = (method === "copy") ? "复制":"剪切";
+                if (method !== ""){
+                    this.$Message.success('已经' + msg + "到粘贴板");
+                }
                 return true;
             },
             pasteClipboard(add_cur_dir = true) {

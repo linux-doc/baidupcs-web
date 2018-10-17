@@ -1,21 +1,21 @@
 <template>
     <div style="height: 60vh; overflow: auto; margin-top: 30px">
         <Row>
-            <Col span="10">文件名</Col>
+            <Col span="9">文件名</Col>
             <Col span="2">密码</Col>
-            <Col span="10">链接</Col>
+            <Col span="11">链接</Col>
             <Col span="2">操作</Col>
         </Row>
         <Row class="file_list" style="margin-top: 8px"
              v-for="item in shareData">
-            <Col span="10" style="overflow-x: hidden;white-space: nowrap;">
+            <Col :title="item.name" span="9" style="overflow-x: hidden;text-overflow:ellipsis;white-space: nowrap;">
                 <Icon type="ios-folder-outline" size="24" v-if="item.isDir && !item.isDel"/>
                 <Icon type="ios-document" size="24" v-if="!item.isDir && !item.isDel"/>
                 <Icon type="md-close" size="24" v-if="item.isDel"/>
                 {{item.name}}
             </Col>
             <Col span="2">{{item.password}}</Col>
-            <Col span="10">{{item.link}}</Col>
+            <Col span="11">{{item.link}}</Col>
             <Col span="2">
                 <Button icon="md-close" type="error" ghost @click="cancelShare(item.id)"></Button>
             </Col>
