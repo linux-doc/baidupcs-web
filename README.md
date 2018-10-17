@@ -15,8 +15,8 @@
 ```
 打开终端: 
 1. cd 到软件所在的目录
-2. chmod a+x BaiduPCS-Go-3.5.5-xxx
-3. ./BaiduPCS-Go-3.5.5-xxx
+2. chmod a+x BaiduPCS-Go
+3. ./BaiduPCS-Go
 4. 打开浏览器, 在地址栏输入: localhost:5299 就可以看到界面了
 ```
 
