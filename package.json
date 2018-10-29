@@ -1,58 +1,61 @@
 {
-  "name": "iview-project",
-  "version": "3.0.0",
-  "description": "A base project with Vue.js2、Vue-Router、webpack2 and with iView3.",
-  "main": "index.js",
+  "name": "baidu-pcs-web",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "init": "webpack --progress --config webpack.dev.config.js",
-    "dev": "webpack-dev-server --content-base ./ --open --inline --hot --compress --history-api-fallback --config webpack.dev.config.js",
-    "build": "webpack --progress --hide-modules --config webpack.prod.config.js"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/iview/iview-project.git"
-  },
-  "author": "Aresn",
-  "license": "MIT",
   "dependencies": {
-    "axios": "^0.18.0",
-    "filebrowser-frontend": "^1.6.0",
-    "iview": "^3.0.0",
-    "v-contextmenu": "^2.8.0",
-    "vue": "^2.5.16",
-    "vue-router": "^2.8.1",
-    "x-particles": "^1.0.9"
+    "register-service-worker": "^1.0.0",
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "autoprefixer-loader": "^2.0.0",
-    "babel": "^6.23.0",
-    "babel-core": "^6.23.1",
-    "babel-loader": "^6.2.4",
-    "babel-plugin-transform-runtime": "^6.12.0",
-    "babel-preset-es2015": "^6.9.0",
-    "babel-runtime": "^6.11.6",
-    "css-loader": "^0.23.1",
-    "extract-text-webpack-plugin": "^2.0.0",
-    "file-loader": "^0.8.5",
-    "html-loader": "^0.3.0",
-    "html-webpack-plugin": "^2.28.0",
-    "iview-loader": "^1.2.1",
-    "less": "^2.7.1",
-    "less-loader": "^2.2.3",
-    "style-loader": "^0.13.1",
-    "url-loader": "^0.5.7",
-    "vue-hot-reload-api": "^1.3.3",
-    "vue-html-loader": "^1.2.3",
-    "vue-loader": "^11.0.0",
-    "vue-particles": "^1.0.9",
-    "vue-style-loader": "^1.0.0",
-    "vue-template-compiler": "^2.2.1",
-    "webpack": "^2.2.1",
-    "webpack-dev-server": "^2.4.1",
-    "webpack-merge": "^3.0.0"
+    "@vue/cli-plugin-babel": "^3.0.3",
+    "@vue/cli-plugin-eslint": "^3.0.3",
+    "@vue/cli-plugin-pwa": "^3.0.3",
+    "@vue/cli-service": "^3.0.3",
+    "axios": "^0.18.0",
+    "iview": "^3.1.1",
+    "less": "^3.0.4",
+    "less-loader": "^4.1.0",
+    "v-contextmenu": "^2.8.0",
+    "vue-template-compiler": "^2.5.17"
   },
-  "bugs": {
-    "url": "https://github.com/iview/iview-project/issues"
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "rules": {
+      "no-console": "off",
+      "no-undef": "off",
+      "vue/no-parsing-error": [
+        2,
+        {
+          "x-invalid-end-tag": false
+        }
+      ]
+    },
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
   },
-  "homepage": "https://www.iviewui.com"
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
 }

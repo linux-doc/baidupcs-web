@@ -1,35 +1,37 @@
-import Vue from 'vue';
-import iView from 'iview';
-import VueRouter from 'vue-router';
-import Routers from './router';
-import Util from './libs/util';
-import App from './app.vue';
+import Vue from 'vue'
+import iView from 'iview'
 import 'iview/dist/styles/iview.css';
-import XParticles from 'x-particles'
+import './less/common.less'
+import App from './App.vue'
+import router from './router'
+import store from './store'
+import axios from 'axios'
+import config from './config'
+import './registerServiceWorker'
 
-Vue.use(VueRouter);
-Vue.use(iView);
-Vue.use(XParticles);
+Vue.use(iView)
+Vue.config.productionTip = false
 
-// 路由配置
-const RouterConfig = {
-    mode: 'history',
-    routes: Routers
-};
-const router = new VueRouter(RouterConfig);
-router.beforeEach((to, from, next) => {
-    iView.LoadingBar.start();
-    Util.title(to.meta.title);
-    next();
-});
+Vue.prototype.error = function(msg) {
+  this.$Message.error({
+    content: msg
+  })
+}
 
-router.afterEach((to, from, next) => {
-    iView.LoadingBar.finish();
-    window.scrollTo(0, 0);
-});
+window.$axios = axios.create({
+  baseURL: `${config.base_url}/api/v1/`
+})
 
-new Vue({
-    el: '#app',
-    router: router,
-    render: h => h(App)
-});
+store
+    .dispatch('init')
+    .then(() => {
+      new Vue({
+        router,
+        store,
+        render: h => h(App)
+      }).$mount('#app')
+    })
+
+
+// import XParticles from 'x-particles'
+// Vue.use(XParticles);
