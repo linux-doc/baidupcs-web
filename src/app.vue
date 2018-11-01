@@ -166,7 +166,8 @@
                                 this.$Notice.info({
                                     top: 50,
                                     duration: 10,
-                                    title: this.notices[i].Msg,
+                                    title: "温馨提示",
+                                    desc: this.notices[i].Msg,
                                 })
                             }
                         }
