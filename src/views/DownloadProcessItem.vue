@@ -33,7 +33,7 @@
         <Col span="11">
           <Progress :percent="item.percent" status="active"/>
         </Col>
-        <Col span="3" v-if="itype === 1 && istatus === 2">
+        <Col class="c-action-group" span="3" v-if="itype === 1 && istatus === 2">
           <Button size="small" type="success" ghost v-if="item.is_pause"
                   @click="switchDownloadStatus(item)">
             <Icon type="md-play"></Icon>
@@ -144,9 +144,3 @@
     }
   }
 </script>
-
-<style lang="less">
-  .ivu-btn {
-    margin: 0 4px;
-  }
-</style>

@@ -19,7 +19,7 @@
       <Content>
         <Spin size="large" fix v-if="spin_show"></Spin>
         <Row :gutter="12">
-          <Col span="8">
+          <Col span="10">
             <Checkbox :indeterminate="indeterminate" :value="checkAll" @click.prevent.native="handleCheckAll">全选</Checkbox>
             <Button @click="changeViewMode" type="text">
               <Icon type="md-reorder" size="24" v-if="files_view_mode === 1"></Icon>
@@ -41,8 +41,8 @@
                    placeholder="在当前文件夹下搜索..." style="width: auto"/>
             <Button style="margin-left: 8px" @click="offlineDownload"><Icon type="md-link"></Icon>离线下载</Button>
           </Col>
-          <Col span="16" style="text-align: right;">
-            <ButtonGroup>
+          <Col span="14" style="text-align: right;">
+            <ButtonGroup class="c-btn-group">
               <Button @click="addItemToClipboard('copy')"><Icon type="md-copy"></Icon>复制</Button>
               <Button @click="addItemToClipboard('move')"><Icon type="md-cut"></Icon>剪切</Button>
               <Button @click="pasteClipboard"><Icon type="md-clipboard"></Icon>粘贴</Button>
