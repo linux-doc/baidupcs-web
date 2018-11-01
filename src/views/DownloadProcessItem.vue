@@ -96,7 +96,7 @@
         this.$Modal.confirm({
           title: '删除任务后无法恢复, 确定吗?',
           onOk: async () => {
-            const result = await $axios.get(`download?method=cancel&id=${item.lastID}`).catch(this.error)
+            const result = await $axios.get(`download?method=cancel&id=${item.LastID}`).catch(this.error)
             if (result.data.code === 0) {
               this.$Message.success('操作成功')
             } else {
@@ -138,7 +138,7 @@
         }
       },
       detailTask(item) {
-        this.getTaskStatus(item.lastID)
+        this.getTaskStatus(item.LastID)
         this.modalDetailFlag = true
       }
     }
