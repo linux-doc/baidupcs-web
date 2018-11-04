@@ -21,11 +21,25 @@
               <Badge dot v-if="updateFlag">更新</Badge>
               <span v-else>更新</span>
             </MenuItem>
+            <MenuItem name="lock" @click.native="startSetLockPwd">设置锁定密码</MenuItem>
+            <MenuItem name="lock" @click.native="switchUser">切换账号</MenuItem>
             <MenuItem name="logout" @click.native="logout">退出</MenuItem>
           </Submenu>
         </div>
       </Menu>
     </Header>
+
+    <Modal v-model="modalSetLockFlag" :width="800">
+      <Row>
+        <i-input type="password" placeholder="输入原锁定密码(第一次设置可不填)" v-model="oldLockPwd"></i-input>
+      </Row>
+      <Row>
+        <i-input type="password" placeholder="输入新锁定密码" v-model="newLockPwd"></i-input>
+      </Row>
+      <div slot="footer">
+        <Button type="info" @click="setLockPwd">确认</Button>
+      </div>
+    </Modal>
 
     <Modal v-model="modalShareFlag" :width="800">
       <v-share v-if="modalShareFlag"/>
@@ -74,7 +88,10 @@
         formData: { config: [] },
         notices: [],
         updateVersion: [],
-        updateFlag: false
+        updateFlag: false,
+        modalSetLockFlag: false,
+        oldLockPwd: '',
+        newLockPwd: ''
       }
     },
     computed: {
@@ -172,6 +189,25 @@
             }
           }
         }
+      },
+      startSetLockPwd() {
+        this.lockPwd = ''
+        this.modalSetLockFlag = true
+      },
+      async setLockPwd() {
+        const body = await $axios.get(`password?method=set&oldpass=${this.oldLockPwd}&password=${this.newLockPwd}`).catch(this.error)
+        if (body.data.code === 0) {
+          this.$Message.success('设置成功')
+          this.modalSetLockFlag = false
+          localStorage.lastUnlockTime = new Date().getTime()
+        }
+
+        if (body.data.code === -3) {
+          this.$Message.error(body.data.msg)
+        }
+      },
+      switchUser() {
+        this.$router.push('/login')
       }
     },
     mounted() {
