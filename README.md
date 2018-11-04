@@ -13,7 +13,7 @@
 
 对于 Linux 和 Mac 版本:
 ```
-打开终端: 
+打开终端:
 1. cd 到软件所在的目录
 2. chmod a+x BaiduPCS-Go
 3. ./BaiduPCS-Go

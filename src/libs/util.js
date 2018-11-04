@@ -1,12 +1,9 @@
-let util = {
-
-};
-util.title = function (title) {
+export default {
+  title(title) {
     title = title ? title + ' - Home' : 'baidupcs-web';
     window.document.title = title;
-};
-
-util.formatDateTime = function(inputTime) {
+  },
+  formatDateTime(inputTime) {
     var date = new Date(inputTime);
     var y = date.getFullYear();
     var m = date.getMonth() + 1;
@@ -20,15 +17,18 @@ util.formatDateTime = function(inputTime) {
     minute = minute < 10 ? ('0' + minute) : minute;
     second = second < 10 ? ('0' + second) : second;
     return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
-};
-
-util.bytesToSize = function(bytes) {
+  },
+  bytesToSize(bytes) {
     if (bytes === 0) return '0 B';
     var k = 1000, // or 1024
         sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
         i = Math.floor(Math.log(bytes) / Math.log(k));
 
     return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
-};
-
-export default util;
+  },
+  sleep(delay = 1000) {
+    return new Promise(resolve => {
+      setTimeout(() => resolve(), delay)
+    })
+  }
+}
