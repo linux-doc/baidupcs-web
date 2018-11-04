@@ -34,7 +34,7 @@
         </div>
       </Card>
       <Card v-if="users.length">
-        <Row>已登录用户</Row>
+        <Row style="text-align: center;font-weight: 700;">已登录用户</Row>
         <Row v-for="(user, i) of users" :key="i" @click.native="selectUser(user)">{{user.name}}</Row>
       </Card>
     </div>
