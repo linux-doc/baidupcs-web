@@ -15,8 +15,8 @@
             <Col span="14" style="padding: 0;">
               <Select v-model="verify_type" @on-change="websocketsend" placeholder="请选择验证方法"
                       v-if="show_verify_types">
-                <Option v-for="item in verify_types" :value="item.value" :key="item.value">{{ item.label
-                  }}
+                <Option v-for="item in verify_types" :value="item.value" :key="item.value">
+                  {{item.label}}
                 </Option>
               </Select>
               <img :src="verify_img" v-if="verify_img">
@@ -131,7 +131,7 @@
               this.show_verify_code = true;
               break;
             case 7: //登录成功
-              location.href = '/'
+              location.href = '/dist'
               localStorage.lastUnlockTime = new Date().getTime()
               break;
           }
