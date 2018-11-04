@@ -58,9 +58,10 @@ export default new Vuex.Store({
           }
         }
       } else {
-        commit('setUserInfo', { user, login })
-        return true
+        user = {}
       }
+      commit('setUserInfo', { user, login })
+      return true
     }
   }
 })

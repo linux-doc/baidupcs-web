@@ -34,6 +34,7 @@
         </div>
       </Card>
       <Card v-if="users.length">
+        <Row>已登录用户</Row>
         <Row v-for="(user, i) of users" :key="i" @click.native="selectUser(user)">{{user.name}}</Row>
       </Card>
     </div>
@@ -167,7 +168,7 @@
         const body = await $axios.get(`user?method=set&name=${user.name}`).catch(this.error)
         if (body === undefined) return
         if (body.data.code === 0) {
-          location.href = '/'
+          location.href = '/dist'
         }
       }
     },
@@ -209,7 +210,7 @@
     .ivu-card:nth-child(2) {
       margin-left: 8px;
 
-      .ivu-row {
+      .ivu-row:not(:first-child) {
         padding: 8px;
         cursor: pointer;
         transition: color .2s;
