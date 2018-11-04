@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Login from './views/Login'
 import Nav from './components/Nav'
+import Lock from './views/Lock.vue'
 
 Vue.use(Router)
 
@@ -18,6 +19,7 @@ const router = new Router({
       }
     },
     { path: '/login', component: Login },
+    { path: '/lock', component: Lock },
     {
       path: '/download',
       components: {

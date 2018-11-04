@@ -33,6 +33,9 @@
           </Button>
         </div>
       </Card>
+      <Card v-if="users.length">
+        <Row v-for="(user, i) of users" :key="i" @click.native="selectUser(user)">{{user.name}}</Row>
+      </Card>
     </div>
   </div>
 </template>
@@ -58,7 +61,8 @@
         button_loading: false,
         websocket: null,
         init_websocket: false,
-        config: {}
+        config: {},
+        users: []
       }
     },
     methods: {
@@ -128,6 +132,7 @@
               break;
             case 7: //登录成功
               location.href = '/'
+              localStorage.lastUnlockTime = new Date().getTime()
               break;
           }
         }
@@ -157,11 +162,25 @@
         if (ev.keyCode === 13) {
           this.websocketsend()
         }
+      },
+      async selectUser(user) {
+        const body = await $axios.get(`user?method=set&name=${user.name}`).catch(this.error)
+        if (body === undefined) return
+        if (body.data.code === 0) {
+          location.href = '/'
+        }
       }
     },
     destroyed() {
       if (this.init_websocket) {
         this.websocketclose();
+      }
+    },
+    async created() {
+      const body = await $axios.get('user?method=list').catch(this.error)
+      if (body === undefined) return
+      if (body.data.code === 0) {
+        this.users = body.data.data
       }
     }
   }
@@ -180,7 +199,26 @@
   }
 
   .login-con {
-    width: 300px;
+    display: flex;
+    /*width: 300px;*/
+
+    .ivu-card:first-child {
+      width: 300px;
+    }
+
+    .ivu-card:nth-child(2) {
+      margin-left: 8px;
+
+      .ivu-row {
+        padding: 8px;
+        cursor: pointer;
+        transition: color .2s;
+
+        &:hover {
+          color: #19be6b;
+        }
+      }
+    }
   }
 
   .form-con {
