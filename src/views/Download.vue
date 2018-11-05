@@ -19,7 +19,10 @@
         </Submenu>
       </Menu>
     </Sider>
-    <Layout :style="{padding: '0 24px 24px'}">
+    <Layout :style="{padding: '24px'}">
+      <div style="margin-bottom: 8px;" v-if="select_menu_name === '1-1' && (globals.downloading.length || globals.pending_download.length)">
+        <Button size="small" type="error" ghost @click="cancelAll">全部取消</Button>
+      </div>
       <!--下载相关-->
       <v-download-process-item :items="globals.downloading" :itype="1" :istatus="2"
                                v-show="select_menu_name === '1-1'"></v-download-process-item>
@@ -192,6 +195,25 @@
             closable: true
           })
         }
+      },
+      cancelAll() {
+        this.$Modal.confirm({
+          title: '删除任务后无法恢复, 确定吗?',
+          onOk: async () => {
+            const ids = [
+              ...this.globals.downloading.map(item => item.LastID),
+              ...this.globals.pending_download.map(item => item.LastID)
+            ]
+            let body
+            for (let i = 0; i < ids.length; i++) {
+              do {
+                await utils.sleep()
+                body = await $axios.get(`download?method=cancel&id=${ids[i]}`).catch(this.error)
+              } while (body.data.code !== 0)
+              await utils.sleep()
+            }
+          }
+        })
       }
     },
     created() {
