@@ -59,7 +59,7 @@
           <CheckboxGroup style="overflow: auto; height: 100%;" v-model="checkGroup"
                          @on-change="checkAllGroupChange">
             <Card v-show="files_view_mode === 1" :bordered="false" class="icons-item"
-                  @dblclick.native="DClickFolder(item)" v-for="(item, i) of current_folders" :key="i">
+                  @click.native="openDir(item)" v-for="(item, i) of current_folders" :key="i">
               <Checkbox :label="item.path" style="position: absolute; top: 0; left: 0;"><span></span></Checkbox>
               <Icon type="ios-folder-outline" size="32" v-if="item.isdir"/>
               <Icon type="ios-document" size="32" v-if="!item.isdir"/>
@@ -71,11 +71,11 @@
                 <Col span="3">大小</Col>
                 <Col span="5">修改时间</Col>
               </Row>
-              <Row class="file_list" @dblclick.native="DClickFolder(item)" v-for="(item, i) of current_folders" :key="i">
+              <Row class="file_list" v-for="(item, i) of current_folders" :key="i">
                 <Col span="1">
                   <Checkbox :label="item.path"><span></span></Checkbox>
                 </Col>
-                <Col span="13">
+                <Col span="13" class="ivu-col-filename" @click.native="openDir(item)">
                   <div :title="item.title" style="overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;">
                     <Icon type="ios-folder-outline" size="24" v-if="item.isdir"/>
                     <Icon type="ios-document" size="24" v-if="!item.isdir"/>
@@ -183,13 +183,11 @@
         this.bread_item = path.split("/");
         this.bread_item.splice(0, 1);
       },
-      DClickFolder(item) {
-        if (!item.isdir) {
-          return;
-        }
+      openDir(item) {
+        if (!item.isdir) return
 
-        this.getPathData(item.path, this.setCurrentFolder);
-        this.setBreadPath(item.path);
+        this.getPathData(item.path, this.setCurrentFolder)
+        this.setBreadPath(item.path)
       },
       clickBreadItem(index) {
         var path = "/";
@@ -523,6 +521,15 @@
     transition: all .2s ease;
     position: relative;
     padding-top: 10px;
+    cursor: pointer;
+  }
+
+  .icons-item p {
+    transition: color .2s;
+  }
+
+  .icons-item:hover p {
+    color: #2d8cf0;
   }
 
   .file_list {
@@ -532,5 +539,14 @@
   .file_list:hover {
     box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
     border-color: #eee;
+  }
+
+  .ivu-col-filename {
+    cursor: pointer;
+    transition: color .2s;
+  }
+
+  .ivu-col-filename:hover {
+    color: #2d8cf0;
   }
 </style>
