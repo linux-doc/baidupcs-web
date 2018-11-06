@@ -4,6 +4,7 @@ import Home from './views/Home.vue'
 import Login from './views/Login'
 import Nav from './components/Nav'
 import Lock from './views/Lock.vue'
+import store from './store'
 
 Vue.use(Router)
 
@@ -16,7 +17,8 @@ const router = new Router({
       components: {
         default: Home,
         nav: Nav
-      }
+      },
+      meta: { auth: true }
     },
     { path: '/login', component: Login },
     { path: '/lock', component: Lock },
@@ -25,18 +27,27 @@ const router = new Router({
       components: {
         default: () => import(/* webpackChunkName: "download" */ './views/Download'),
         nav: Nav
-      }
+      },
+      meta: { auth: true }
     }
   ]
 })
 
-/*router.beforeEach((to, from, next) => {
-  iView.LoadingBar.start()
-  Util.title(to.meta.title)
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.auth)) {
+    if (!store.state.login) {
+      next('/login')
+      return
+    }
+    if (store.state.isLock) {
+      next('/lock')
+      return
+    }
+  }
   next()
 })
 
-router.afterEach((to, from, next) => {
+/*router.afterEach((to, from, next) => {
   iView.LoadingBar.finish()
   window.scrollTo(0, 0)
 })*/
