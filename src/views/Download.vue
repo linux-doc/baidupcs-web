@@ -19,7 +19,10 @@
         </Submenu>
       </Menu>
     </Sider>
-    <Layout :style="{padding: '0 24px 24px'}">
+    <Layout :style="{padding: '24px'}">
+      <div style="margin-bottom: 8px;" v-if="select_menu_name === '1-1' && (globals.downloading.length || globals.pending_download.length)">
+        <Button size="small" type="error" ghost @click="cancelAll">全部取消</Button>
+      </div>
       <!--下载相关-->
       <v-download-process-item :items="globals.downloading" :itype="1" :istatus="2"
                                v-show="select_menu_name === '1-1'"></v-download-process-item>
@@ -119,181 +122,11 @@
       ...mapMutations(['initWS']),
       initWebSocket() {
         if (this.websocket === null) this.initWS()
-
-        this.websocket.onmessage = this.receiveData
-      },
-      receiveData(e) {
-        const redata = JSON.parse(e.data)
-        if (redata.code !== 0) {
-          this.$Message.error({
-            content: redata.msg,
-            duration: 10,
-            closable: true
-          })
-        }
-
-        let pos = 0
-        let ditem = {}
-        const data = JSON.parse(redata.data.replace(/\\/g, '/'))
-
-        //下载任务
-        if (redata.type === 2) {
-          switch (redata.status) {
-            case 1: //添加到下载任务列表
-              let fd_names = data.path.split('/')
-              this.globals.downloading.push({
-                LastID: data.LastID,
-                path: data.path,
-                name: fd_names.pop(),
-                speed: '0KB',
-                avg_speed: '0KB',
-                time_used: '0s',
-                download_size: '0KB',
-                total_size: '--KB',
-                time_left: '--s',
-                percent: 0,
-                is_pause: false,
-                status: redata.status,
-              });
-              break;
-            case 2:
-              this.removeDownloadingList(data.path)
-              break
-            case 5: //正在下载
-              ditem = this.globals.downloading.find(item => item.LastID === data.LastID)
-              if (!ditem) {
-                data.status = redata.status
-                this.globals.downloading.push(data)
-              } else {
-                if (!ditem.is_pause) {
-                  ditem.speed = data.speed
-                  ditem.avg_speed = data.avg_speed
-                  ditem.time_used = data.time_used
-                  ditem.download_size = data.download_size
-                  ditem.total_size = data.total_size
-                  ditem.time_left = data.time_left
-                  ditem.percent = data.percent
-                  ditem.status = redata.status
-                }
-              }
-              break
-            case 6: //任务暂停
-              ditem = this.globals.downloading.find(item => item.LastID === data.LastID)
-              ditem.is_pause = true
-              ditem.speed = '0KB'
-              ditem.avg_speed = '0KB'
-              ditem.time_left = '--s'
-              ditem.status = redata.status
-              break
-            case 7: //任务恢复
-              ditem = this.globals.downloading.find(item => item.LastID === data.LastID)
-              ditem.is_pause = false
-              ditem.status = redata.status
-              break
-            case 8: //任务删除
-              pos = this.getIndexFromArray(this.globals.downloading, data.LastID);
-              this.globals.downloading.splice(pos, 1);
-              break
-            case 9: //任务完成
-              pos = this.globals.downloading.findIndex(item => item.LastID === data.LastID)
-              if (pos >= 0) {
-                ditem = this.globals.downloading[pos]
-                this.globals.downloaded.push({
-                  LastID: ditem.LastID,
-                  path: ditem.path,
-                  name: ditem.name,
-                  speed: ditem.speed,
-                  avg_speed: ditem.avg_speed,
-                  time_used: ditem.time_used,
-                  download_size: ditem.download_size,
-                  total_size: ditem.total_size,
-                  time_left: '0s',
-                  percent: 100,
-                  status: redata.status,
-                  save_path: data.savePath,
-                })
-                this.globals.downloading.splice(pos, 1)
-              }
-              break
-          }
-        }
-
-        //上传任务
-        if (redata.type === 3) {
-          switch (redata.status) {
-            case 1: //添加到上传任务中
-              let fd_names = data.path.split('/')
-              this.globals.uploading.push({
-                LastID: data.LastID,
-                path: data.path,
-                name: fd_names.pop(),
-                speed: '0KB',
-                avg_speed: '0KB',
-                time_used: '0s',
-                uploaded_size: '0KB',
-                total_size: '--KB',
-                time_left: '--s',
-                percent: 0,
-                is_pause: false,
-                status: redata.status,
-              })
-              break
-            case 2:
-              break
-            case 3: //秒传成功
-              pos = this.globals.uploading.findIndex(item => item.LastID === data.LastID)
-              ditem = this.globals.uploading[pos]
-              ditem.percent = 100
-              ditem.status = redata.status
-              ditem.save_path = data.savePath
-              this.globals.uploaded.push(ditem)
-              this.globals.uploading.splice(pos, 1)
-              break
-            case 4: //正在上传
-              ditem = this.globals.uploading.find(item => item.LastID === data.LastID)
-              ditem.speed = data.speed
-              ditem.avg_speed = data.avg_speed
-              ditem.time_used = data.time_used
-              ditem.uploaded_size = data.uploaded_size
-              ditem.total_size = data.total_size
-              ditem.time_left = data.time_left
-              ditem.percent = data.percent
-              ditem.status = redata.status
-              break
-            case 5: //上传完成
-              pos = this.globals.uploading.findIndex(item => item.LastID === data.LastID)
-              ditem = this.globals.uploading[pos]
-              this.globals.uploaded.push({
-                LastID: ditem.LastID,
-                path: ditem.path,
-                name: ditem.name,
-                speed: ditem.speed,
-                avg_speed: ditem.avg_speed,
-                time_used: ditem.time_used,
-                uploaded_size: ditem.uploaded_size,
-                total_size: ditem.total_size,
-                time_left: '0s',
-                percent: 100,
-                status: redata.status,
-                save_path: data.savePath
-              })
-              this.globals.uploading.splice(pos, 1)
-              break
-          }
-        }
       },
       getMenuName(name) {
         this.select_menu_name = name
         if (name === '3-1' || name === '3-2') {
           this.getOfflineTask()
-        }
-      },
-      removeDownloadingList(path) {
-        for (let i = 0; i < this.globals.downloading.length; i++) {
-          if (path === this.globals.downloading[i].path) {
-            this.globals.downloading.splice(i, 1)
-            break
-          }
         }
       },
       async deleteTask(item) {
@@ -362,6 +195,25 @@
             closable: true
           })
         }
+      },
+      cancelAll() {
+        this.$Modal.confirm({
+          title: '删除任务后无法恢复, 确定吗?',
+          onOk: async () => {
+            const ids = [
+              ...this.globals.downloading.map(item => item.LastID),
+              ...this.globals.pending_download.map(item => item.LastID)
+            ]
+            let body
+            for (let i = 0; i < ids.length; i++) {
+              do {
+                await utils.sleep()
+                body = await $axios.get(`download?method=cancel&id=${ids[i]}`).catch(this.error)
+              } while (body.data.code !== 0)
+              await utils.sleep()
+            }
+          }
+        })
       }
     },
     created() {
