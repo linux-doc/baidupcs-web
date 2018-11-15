@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <Modal v-model="isShowModal" :width="800">
+    <Modal v-model="isShowModal" :width="400">
       <i-input type="password" placeholder="输入锁定密码" v-model="lockPwd"></i-input>
       <div slot="footer">
         <Button type="info" @click="unlock">确认</Button>

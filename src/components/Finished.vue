@@ -6,7 +6,7 @@
         <span>{{item.total_size}}</span>
       </p>
       <Row>
-        <Col span="4"><Progress :percent="item.percent" status="active"/></Col>
+        <Col span="1"><Icon type="md-checkmark-circle" size="24" color="#19be6b" /></Col>
         <Col span="20">
           <span>平均速度: {{item.avg_speed}}/s</span>
           <Divider type="vertical"/>

@@ -254,7 +254,7 @@
         this.clipboard = this.checkGroup.slice()
         this.clipboard_method = method
         const msg = method === 'copy' ? '复制' : '剪切'
-        if (method !== '') {
+        if (method !== '' && method !== 'remove') {
           this.$Message.success('已经' + msg + '到粘贴板')
         }
         return true

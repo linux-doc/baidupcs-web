@@ -13,6 +13,9 @@
           <MenuItem name="share" @click.native="modalShareFlag = true">
             <Icon type="md-share"/>分享管理
           </MenuItem>
+          <MenuItem name="recycled" @click.native="modalRecycleFlag = true">
+            <Icon type="md-trash"/>回收站管理
+          </MenuItem>
           <Submenu name="4">
             <template slot="title"><Icon type="md-person"/>{{user.name}}</template>
             <MenuItem name="profile" @click.native="showProfile">简介~</MenuItem>
@@ -29,7 +32,7 @@
       </Menu>
     </Header>
 
-    <Modal v-model="modalSetLockFlag" :width="800">
+    <Modal v-model="modalSetLockFlag" :width="400">
       <Row>
         <i-input type="password" placeholder="输入原锁定密码(第一次设置可不填)" v-model="oldLockPwd"></i-input>
       </Row>
@@ -45,6 +48,14 @@
       <v-share v-if="modalShareFlag"/>
       <div slot="footer">
         <Button type="info" @click="modalShareFlag = false">确认</Button>
+      </div>
+    </Modal>
+
+    <Modal v-model="modalRecycleFlag" :width="800">
+      <v-recycle v-if="modalRecycleFlag"/>
+      <div slot="footer">
+        <Button type="error" @click="clearRecycle" :loading="loadingRecycleFlag">清空回收站</Button>
+        <Button type="info" @click="modalRecycleFlag = false">确认</Button>
       </div>
     </Modal>
 
@@ -75,11 +86,13 @@
 <script>
   import {mapState} from 'vuex'
   import VShare from '../views/Share'
+  import VRecycle from '../views/Recycle'
 
   export default {
     data() {
       return {
         modalShareFlag: false,
+        modalRecycleFlag: false,
         modalSettingFlag: false,
         quotaData: {
           flag: false,
@@ -91,13 +104,14 @@
         updateFlag: false,
         modalSetLockFlag: false,
         oldLockPwd: '',
-        newLockPwd: ''
+        newLockPwd: '',
+        loadingRecycleFlag: false,
       }
     },
     computed: {
       ...mapState(['user', 'login'])
     },
-    components: { VShare },
+    components: { VShare, VRecycle },
     methods: {
       showProfile() {
         this.$Modal.success({
@@ -208,7 +222,16 @@
       },
       switchUser() {
         this.$router.push('/login')
-      }
+      },
+      async clearRecycle() {
+          this.loadingRecycleFlag = true
+          const body = await $axios.get('recycle?method=clear').catch(this.error)
+          if (body.data.code === 0) {
+              this.loadingRecycleFlag = false
+              this.modalRecycleFlag = false
+              this.$Message.success('清空回收站成功')
+          }
+      },
     },
     mounted() {
       this.getUpdate()
