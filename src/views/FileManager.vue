@@ -81,6 +81,8 @@
                     <Icon type="ios-document" size="24" v-if="!item.isdir"/>
                     {{item.title}}
                     <Button class="ivu-col-rename-btn" size="small" type="text" @click.stop="renameFunc(item.title)">重命名</Button>
+                    <Button class="ivu-col-rename-btn" size="small" type="text" @click.stop="removeFile(item.path)">删除</Button>
+                    <Button class="ivu-col-rename-btn" size="small" type="text" @click.stop="downloadFile(item.path)">下载</Button>
                   </div>
                 </Col>
                 <Col span="2">
@@ -285,6 +287,21 @@
           }
         })
       },
+      removeFile(path) {
+        this.$Modal.confirm({
+          title: '确认删除吗?',
+          content: '<p>将会把文件移至百度云回收站</p>',
+          onOk: async () => {
+            let cur_dir = `/${this.bread_item.join('/')}`
+            const result = await $axios.get(`file_operation?method=remove&paths=${encodeURIComponent(path)}`).catch(this.error)
+            if (result.data.code !== 0) {
+              this.$Message.error(result.data.msg)
+            } else {
+              this.getPathData(cur_dir, this.setCurrentFolder)
+            }
+          }
+        })
+      },
       pressBackKey(e) {
         if (e.keyCode === 8) {
           this.globals.press_back_key = true
@@ -329,6 +346,19 @@
         }))
         this.$Message.success('已经添加到下载队列!')
         this.resetCheckGroup()
+      },
+      async downloadFile(path) {
+        if (this.websocket === null) this.initWS()
+
+        if (this.websocket.readyState !== 1) await utils.sleep(500)
+
+        let paths = new Array(path)
+        this.websocket.send(JSON.stringify({
+          type: 2,
+          method: 'download',
+          paths: paths
+        }))
+        this.$Message.success('已经添加到下载队列!')
       },
       async shareFiles() {
         if (this.addItemToClipboard('') === false) return

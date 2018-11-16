@@ -50,20 +50,15 @@ function receiveData(e, state) {
         break
       case 5: //正在下载
         ditem = state.globals.downloading.find(item => item.LastID === data.LastID)
-        if (!ditem) {
-          data.status = redata.status
-          state.globals.downloading.push(data)
-        } else {
-          if (!ditem.is_pause) {
-            ditem.speed = data.speed
-            ditem.avg_speed = data.avg_speed
-            ditem.time_used = data.time_used
-            ditem.download_size = data.download_size
-            ditem.total_size = data.total_size
-            ditem.time_left = data.time_left
-            ditem.percent = data.percent
-            ditem.status = redata.status
-          }
+        if (!ditem.is_pause) {
+          ditem.speed = data.speed
+          ditem.avg_speed = data.avg_speed
+          ditem.time_used = data.time_used
+          ditem.download_size = data.download_size
+          ditem.total_size = data.total_size
+          ditem.time_left = data.time_left
+          ditem.percent = data.percent
+          ditem.status = redata.status
         }
         break
       case 6: //任务暂停

@@ -13,7 +13,7 @@
         {{item.name}}
       </Col>
       <Col span="2">{{item.size}}</Col>
-      <Col span="8" :title="item.path">{{item.path}}</Col>
+      <Col span="8" :title="item.path" style="overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;">{{item.path}}</Col>
       <Col span="2">{{item.leftTime}}</Col>
       <Col span="2"><Button icon="md-undo" type="info" ghost @click="restoreRecycle(item.fid)"></Button></Col>
       <Col span="2"><Button icon="md-close" type="error" ghost @click="deleteRecycle(item.fid)"></Button></Col>
