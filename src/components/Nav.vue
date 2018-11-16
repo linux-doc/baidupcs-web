@@ -125,16 +125,17 @@
       },
       async startSet() {
         this.modalSettingFlag = true
-        const quota = await $axios.get('quota').catch(this.error)
-        if (quota.data.code === 0) {
-          this.quotaData.data = JSON.parse(quota.data.data)
-          this.quotaData.flag = true
-        }
 
         const setting = await $axios.get('setting?method=get').catch(this.error)
         if (setting.data.code === 0) {
           this.formData.config = setting.data.data
           // this.formData.config.shift()
+        }
+
+        const quota = await $axios.get('quota').catch(this.error)
+        if (quota.data.code === 0) {
+          this.quotaData.data = JSON.parse(quota.data.data)
+          this.quotaData.flag = true
         }
       },
       async updateSetting() {
