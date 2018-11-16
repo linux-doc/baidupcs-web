@@ -142,7 +142,7 @@
         let settings = this.$refs['settingForm'].model.config;
         let params = "";
         for (let i = 0; i < settings.length; i++) {
-          params += '&' + settings[i].en_name + '=' + settings[i].value;
+          params += '&' + settings[i].en_name + '=' + encodeURIComponent(settings[i].value);
         }
         const body = await $axios.get(`setting?method=set${params}`).catch(this.error)
         if (body.data.code === -1) {
