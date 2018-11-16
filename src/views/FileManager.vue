@@ -75,11 +75,12 @@
                 <Col span="1">
                   <Checkbox :label="item.path"><span></span></Checkbox>
                 </Col>
-                <Col span="13" class="ivu-col-filename" @click.native="openDir(item)">
+                <Col span="13" :class="{'ivu-col-dirname': item.isdir, 'ivu-col-filename': !item.isdir}" @click.native="openDir(item)">
                   <div :title="item.title" style="overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;">
                     <Icon type="ios-folder-outline" size="24" v-if="item.isdir"/>
                     <Icon type="ios-document" size="24" v-if="!item.isdir"/>
                     {{item.title}}
+                    <Button class="ivu-col-rename-btn" size="small" type="text" @click.stop="renameFunc(item.title)">重命名</Button>
                   </div>
                 </Col>
                 <Col span="2">
@@ -129,7 +130,8 @@
         new_folder_name: '',
         modalFlag: false,
         searchKey: '',
-        downloadLink: ''
+        downloadLink: '',
+        new_file_name: '',
       }
     },
     computed: {
@@ -382,6 +384,39 @@
           }
         });
       },
+      renameFunc(name) {
+        this.$Modal.confirm({
+            render: (h) => {
+                return h('Input', {
+                    props: {
+                        value: name,
+                        autofocus: true,
+                    },
+                    on: {
+                        input: (val) => {
+                            this.new_file_name = val;
+                        }
+                    }
+                })
+            },
+            loading: true,
+            okText: '确认',
+            cancelText: '取消',
+            onOk: async () => {
+                const cur_dir = `/${this.bread_item.join('/')}`
+                const old_name = `${cur_dir}/${name}`
+                const new_name = `${cur_dir}/${this.new_file_name}`
+                const result = await $axios.get(`file_operation?method=move&paths=${encodeURIComponent(old_name + '|' + new_name)}`)
+                this.$Modal.remove()
+                this.new_folder_name = ''
+                if (result.data.code !== 0) {
+                    this.$Message.error(result.data.msg)
+                } else {
+                    this.getPathData(cur_dir, this.setCurrentFolder)
+                }
+            }
+        });
+      },
       changeViewMode() {
         if (this.files_view_mode === 1) {
           this.files_view_mode = 2;
@@ -541,12 +576,22 @@
     border-color: #eee;
   }
 
-  .ivu-col-filename {
+  .ivu-col-dirname {
     cursor: pointer;
     transition: color .2s;
   }
 
-  .ivu-col-filename:hover {
+  .ivu-col-dirname:hover {
     color: #2d8cf0;
+  }
+
+  .ivu-col-dirname .ivu-col-rename-btn,
+  .ivu-col-filename .ivu-col-rename-btn {
+    display: none;
+  }
+
+  .ivu-col-dirname:hover .ivu-col-rename-btn,
+  .ivu-col-filename:hover .ivu-col-rename-btn {
+    display: inline-block;
   }
 </style>
