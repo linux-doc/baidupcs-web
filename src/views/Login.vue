@@ -3,31 +3,43 @@
     <div class="login-con">
       <Card icon="log-in" title="百度云登录" :bordered="false">
         <div class="form-con">
-          <Input type="text" v-model="username" @keydown.native="watchkey($event)" clearable
-                 placeholder="用户名">
-            <Icon type="ios-person-outline" slot="prepend"></Icon>
-          </Input>
-          <Input type="password" v-model="password" @keydown.native="watchkey($event)" clearable
-                 placeholder="密码">
-            <Icon type="ios-lock-outline" slot="prepend"></Icon>
-          </Input>
-          <Row>
-            <Col span="14" style="padding: 0;">
-              <Select v-model="verify_type" @on-change="websocketsend" placeholder="请选择验证方法"
-                      v-if="show_verify_types">
-                <Option v-for="item in verify_types" :value="item.value" :key="item.value">
-                  {{item.label}}
-                </Option>
-              </Select>
-              <img :src="verify_img" v-if="verify_img">
-            </Col>
-            <Col span="9" offset="1" style="padding: 0;">
-              <Input type="text" v-if="show_verify_code" v-model="verify_code"
-                     @keydown.native="watchkey($event)" clearable placeholder="验证码">
-                <Icon type="ios-barcode-outline" slot="prepend"></Icon>
-              </Input>
-            </Col>
-          </Row>
+          <template v-if="loginWay === 'pwd'">
+            <Input type="text" v-model="username" @keydown.native="watchkey($event)" clearable
+                   placeholder="用户名">
+              <Icon type="ios-person-outline" slot="prepend"></Icon>
+            </Input>
+            <Input type="password" v-model="password" @keydown.native="watchkey($event)" clearable
+                   placeholder="密码">
+              <Icon type="ios-lock-outline" slot="prepend"></Icon>
+            </Input>
+            <Row>
+              <Col span="14" style="padding: 0;">
+                <Select v-model="verify_type" @on-change="websocketsend" placeholder="请选择验证方法"
+                        v-if="show_verify_types">
+                  <Option v-for="item in verify_types" :value="item.value" :key="item.value">
+                    {{item.label}}
+                  </Option>
+                </Select>
+                <img :src="verify_img" v-if="verify_img">
+              </Col>
+              <Col span="9" offset="1" style="padding: 0;">
+                <Input type="text" v-if="show_verify_code" v-model="verify_code"
+                       @keydown.native="watchkey($event)" clearable placeholder="验证码">
+                  <Icon type="ios-barcode-outline" slot="prepend"></Icon>
+                </Input>
+              </Col>
+            </Row>
+          </template>
+
+          <template v-if="loginWay === 'bduss'">
+            <Input type="text" v-model="BDUSS" clearable placeholder="BDUSS"></Input>
+          </template>
+          <div class="row-ways">
+            <div class="way-bduss">
+              <a class="link" v-if="loginWay === 'pwd'" @click="loginWay = 'bduss'">BDUSS登录</a>
+              <a class="link" v-if="loginWay === 'bduss'" @click="loginWay = 'pwd'">密码登录</a>
+            </div>
+          </div>
           <Button type="success" :loading="button_loading" v-on:keyup.enter="websocketsend"
                   @click="websocketsend" long>登录
           </Button>
@@ -48,6 +60,7 @@
     name: 'v-login',
     data() {
       return {
+        loginWay: 'pwd',
         base_url: config.base_url,
         ws_url: config.ws_url,
         login_status: 1,
@@ -63,7 +76,8 @@
         websocket: null,
         init_websocket: false,
         config: {},
-        users: []
+        users: [],
+        BDUSS: ''
       }
     },
     methods: {
@@ -140,6 +154,12 @@
       },
       websocketsend() {//数据发送
         this.button_loading = true;
+
+        if (this.loginWay === 'bduss') {
+          this.loginWithBDUSS()
+          return
+        }
+
         var send_json = {
           "type": 1,
           "status": this.login_status,
@@ -166,6 +186,15 @@
       },
       async selectUser(user) {
         const body = await $axios.get(`user?method=set&name=${user.name}`).catch(this.error)
+        if (body === undefined) return
+        if (body.data.code === 0) {
+          location.href = '/dist'
+        }
+      },
+      async loginWithBDUSS() {
+        if (this.BDUSS === '') return
+
+        const body = await $axios.get(`user?method=login&bduss=${this.BDUSS}`).catch(this.error)
         if (body === undefined) return
         if (body.data.code === 0) {
           location.href = '/dist'
@@ -226,6 +255,14 @@
     padding: 10px 0 0;
     > * {
       margin-bottom: 10px;
+    }
+  }
+
+  .row-ways {
+    display: flex;
+
+    .way-bduss {
+      margin-left: auto;
     }
   }
 </style>
