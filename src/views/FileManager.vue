@@ -315,7 +315,7 @@
         this.globals.pending_upload_data.push(curDir)
         const fileSelect = this.$refs.fileSelect
 
-        if (fileSelect.checkGroup.length === 0) {
+        if (fileSelect.checkedFiles.length === 0) {
           this.$Message.error('请至少选择一个文件')
           return
         }
@@ -326,7 +326,7 @@
 
         this.websocket.send(JSON.stringify({
           type: 3,
-          paths: fileSelect.checkGroup,
+          paths: fileSelect.checkedFiles,
           tpath: curDir
         }))
         this.$Message.success('已经添加到上传队列!')
