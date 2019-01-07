@@ -8,7 +8,7 @@
     <div class="file-list" style="margin-top: 10px;">
       <div class="l-row" style="display: flex;align-items: center;height: 36px;">
         <div class="r-col ivu-col-span-1" style="width: calc(1/24*100%);">
-          <label><input type="checkbox" v-model="isCheckAll"></label>
+          <label class="v-checkbox"><input type="checkbox" v-model="isCheckAll"><span></span></label>
         </div>
         <div class="r-col ivu-col-span-11" style="width: calc(11/24*100%);">文件名</div>
         <div class="r-col ivu-col-span-4" style="width: calc(4/24*100%);">大小</div>
@@ -17,7 +17,7 @@
 
       <div class="l-row" style="display: flex;align-items: center;height: 36px;" v-for="item of fileData">
         <div class="r-col ivu-col-span-1" style="width: calc(1/24*100%);">
-          <label><input type="checkbox" :value="item.path" name="filePath" v-model="checkedFiles"></label>
+          <label class="v-checkbox"><input type="checkbox" :value="item.path" name="filePath" v-model="checkedFiles"><span></span></label>
         </div>
         <div class="r-col ivu-col-span-11" style="width: calc(11/24*100%);overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;" @dblclick="dblClickFolder(item)">{{item.name}}</div>
         <div class="r-col ivu-col-span-4" style="width: calc(4/24*100%);">{{item.size}}</div>

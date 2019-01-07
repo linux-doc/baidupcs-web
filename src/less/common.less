@@ -75,3 +75,77 @@ html, body, #app {
 a.router-link-exact-active {
   color: #7facdc !important;
 }
+
+.v-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  position: relative;
+  font-size: 14px;
+  height: 16px;
+  line-height:16px;
+  cursor: pointer;
+
+  input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 16px;
+    height: 16px;
+    box-shadow: none;
+    border: 1px solid #919191;
+    border-radius: 2px;
+    margin: 0;
+
+    &:checked {
+      border: none;
+      background-color: #2d8cf0;
+
+      & + span:after {
+        transform: scale(1) rotateZ(37deg);
+      }
+    }
+  }
+
+  span:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 7px;
+    height: 12px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-left-color: transparent;
+    transform-origin: 120% 90%;
+    transform: scale(0) rotateZ(37deg);
+    transition: transform .2s cubic-bezier(0.250, 0.460, 0.450, 0.940);
+  }
+
+  &.reverse {
+    flex-direction: row-reverse;
+
+    input {
+      margin-right: 0;
+      margin-left: 8px;
+    }
+
+    span:after {
+      left: inherit;
+      right: 9px;
+    }
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    color: #d9d9d9;
+
+    input {
+      border-color: #d9d9d9;
+
+      &:checked {
+        background-color: #d9d9d9;
+      }
+    }
+  }
+}
