@@ -1,22 +1,41 @@
 <template>
-  <div style="height: 60vh; overflow: auto; margin-top: 30px">
-    <Row>
-      <Col span="9">文件名</Col>
-      <Col span="2">密码</Col>
-      <Col span="11">链接</Col>
-      <Col span="2">操作</Col>
-    </Row>
-    <Row class="file_list" style="margin-top: 8px; line-height: 30px;" v-for="item of shareData">
-      <Col :title="item.name" span="9" style="overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;">
-        <Icon type="ios-folder-outline" size="24" v-if="item.isDir && !item.isDel"/>
-        <Icon type="ios-document" size="24" v-if="!item.isDir && !item.isDel"/>
-        <Icon type="md-close" size="24" v-if="item.isDel"/>
-        {{item.name}}
-      </Col>
-      <Col span="2">{{item.password}}</Col>
-      <Col span="11">{{item.link}}</Col>
-      <Col span="2"><Button icon="md-close" type="error" ghost @click="cancelShare(item.id)"></Button></Col>
-    </Row>
+  <div class="page-recycle">
+    <table class="table">
+      <colgroup>
+        <col style="width: 40%;">
+        <col style="width: 8%;">
+        <col style="width: 44%;">
+        <col style="width: 8%;">
+      </colgroup>
+      <thead>
+      <tr>
+        <th>文件名</th>
+        <th>密码</th>
+        <th>链接</th>
+        <th>操作</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr v-for="item of shareData">
+        <td>
+          <div class="col-long" style="width: 288px;" :title="item.name">
+            <Icon type="ios-folder-outline" size="24" v-if="item.isDir && !item.isDel"/>
+            <Icon type="ios-document" size="24" v-if="!item.isDir && !item.isDel"/>
+            <Icon type="md-close" size="24" v-if="item.isDel"/>
+            {{item.name}}
+          </div>
+        </td>
+        <td>{{item.password}}</td>
+        <td>
+          <div class="col-long" style="width: 350px;">{{item.link}}</div>
+        </td>
+        <td>
+          <Button icon="md-close" type="error" ghost @click="cancelShare(item.id)"></Button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
