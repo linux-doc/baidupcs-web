@@ -1,0 +1,31 @@
+.page-recycle {
+  height: 60vh;
+  overflow: auto;
+  margin-top: 30px;
+
+  .table {
+    thead {
+      tr {
+        text-align: left;
+        height: 30px;
+      }
+    }
+
+    tbody {
+      tr {
+        height: 36px;
+
+        .col-long {
+          width: 222px;
+          overflow-x: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    .ivu-btn {
+      padding: 0 3px;
+    }
+  }
+}

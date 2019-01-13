@@ -1,6 +1,6 @@
 <template>
-  <Layout>
-    <Modal v-model="modalFlag" @on-visible-change="modelVisible">
+  <div class="page-file-manager">
+    <Modal v-model="modalFlag">
       <v-file-select ref="fileSelect"/>
       <div slot="footer">
         <Button type="success" long @click="confirmUpload"><Icon type="md-cloud-upload"></Icon>上传</Button>
@@ -10,21 +10,17 @@
     <Sider :width="300" hide-trigger>
       <Tree :data="folders" :load-data="loadData" @on-select-change="treeSelect"></Tree>
     </Sider>
-    <Layout :style="{padding: '0 24px 24px'}">
-      <Breadcrumb :style="{margin: '24px 0'}">
+    <div class="p-main">
+      <Breadcrumb>
         <BreadcrumbItem to="/" @click.native="clickBreadItem(-1)"><Icon type="ios-home-outline"></Icon>主目录</BreadcrumbItem>
         <BreadcrumbItem to="/" @click.native="clickBreadItem(index)" v-for="(item, index) in bread_item" :key="index">{{item}}</BreadcrumbItem>
       </Breadcrumb>
 
-      <Content>
+      <div class="p-content">
         <Spin size="large" fix v-if="spin_show"></Spin>
-        <Row :gutter="12">
-          <Col span="10">
-            <Checkbox :indeterminate="indeterminate" :value="checkAll" @click.prevent.native="handleCheckAll">全选</Checkbox>
-            <Button @click="changeViewMode" type="text">
-              <Icon type="md-reorder" size="24" v-if="files_view_mode === 1"></Icon>
-              <Icon type="md-apps" size="24" v-if="files_view_mode === 2"></Icon>
-            </Button>
+        <div class="row-tools">
+          <div class="t-l">
+            <label class="v-checkbox"><input type="checkbox" v-model="isCheckAll"><span></span></label>
             <Dropdown @on-click="fileSort" style="margin-right: 16px;">
               <Icon type="md-swap" size="24" style="cursor: pointer"></Icon>
               <DropdownMenu slot="list">
@@ -40,8 +36,9 @@
             <Input v-model="searchKey" @on-search="searchKeyword" suffix="ios-search" search clearable
                    placeholder="在当前文件夹下搜索..." style="width: auto"/>
             <Button style="margin-left: 8px" @click="offlineDownload"><Icon type="md-link"></Icon>离线下载</Button>
-          </Col>
-          <Col span="14" style="text-align: right;">
+          </div>
+
+          <div class="t-r">
             <ButtonGroup class="c-btn-group">
               <Button @click="addItemToClipboard('copy')"><Icon type="md-copy"></Icon>复制</Button>
               <Button @click="addItemToClipboard('move')"><Icon type="md-cut"></Icon>剪切</Button>
@@ -52,54 +49,55 @@
               <Button type="success" @click="modalFlag = true"><Icon type="md-cloud-upload"></Icon>上传</Button>
               <Button type="primary" @click="downloadFiles"><Icon type="md-download"></Icon>下载</Button>
             </ButtonGroup>
-          </Col>
-        </Row>
-        <Divider/>
-        <div class="icons">
-          <CheckboxGroup style="overflow: auto; height: 100%;" v-model="checkGroup"
-                         @on-change="checkAllGroupChange">
-            <Card v-show="files_view_mode === 1" :bordered="false" class="icons-item"
-                  @click.native="openDir(item)" v-for="(item, i) of current_folders" :key="i">
-              <Checkbox :label="item.path" style="position: absolute; top: 0; left: 0;"><span></span></Checkbox>
-              <Icon type="ios-folder-outline" size="32" v-if="item.isdir"/>
-              <Icon type="ios-document" size="32" v-if="!item.isdir"/>
-              <p :title="item.title" style="overflow: hidden;">{{item.title}}</p>
-            </Card>
-            <div v-show="files_view_mode === 2">
-              <Row style="margin-bottom: 10px">
-                <Col span="15" offset="1">文件名</Col>
-                <Col span="3">大小</Col>
-                <Col span="5">修改时间</Col>
-              </Row>
-              <Row class="file_list" v-for="(item, i) of current_folders" :key="i">
-                <Col span="1">
-                  <Checkbox :label="item.path"><span></span></Checkbox>
-                </Col>
-                <Col span="13" :class="{'ivu-col-dirname': item.isdir, 'ivu-col-filename': !item.isdir}" @click.native="openDir(item)">
-                  <div :title="item.title" style="overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;">
+          </div>
+        </div>
+
+        <!--文件列表表格-->
+        <div class="table-wrap">
+          <table class="table files-table">
+            <colgroup>
+              <col style="width: 2%;">
+              <col style="width: 50%;">
+              <col style="width: 20%;">
+              <col style="width: 20%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th></th>
+              <th>文件名</th>
+              <th>大小</th>
+              <th>修改时间</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr v-for="item of current_folders">
+              <td>
+                <label class="v-checkbox"><input type="checkbox" :value="item.path" name="filePath" v-model="checkedFiles"><span></span></label>
+              </td>
+              <td>
+                <div class="item-title" :class="{'is-dir': item.isdir}">
+                  <div class="t-content" @click="openDir(item)">
                     <Icon type="ios-folder-outline" size="24" v-if="item.isdir"/>
                     <Icon type="ios-document" size="24" v-if="!item.isdir"/>
-                    {{item.title}}
+                    <span>{{item.title}}</span>
+                  </div>
+                  <div class="t-buttons">
                     <Button class="ivu-col-rename-btn" size="small" type="text" @click.stop="renameFunc(item.title)">重命名</Button>
                     <Button class="ivu-col-rename-btn" size="small" type="text" @click.stop="removeFile(item.path)">删除</Button>
                     <Button class="ivu-col-rename-btn" size="small" type="text" @click.stop="downloadFile(item.path)">下载</Button>
                   </div>
-                </Col>
-                <Col span="2">
-                  <Button @click="jumpToFolder(item.folder)" v-if="item.folder" type="success" size="small" ghost>
-                    <Icon type="ios-redo"/>目录
-                  </Button>
-                  <span v-else>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span>
-                </Col>
-                <Col span="3"> {{item.size}}</Col>
-                <Col span="5"> {{item.mtime}}</Col>
-              </Row>
-            </div>
-          </CheckboxGroup>
+                </div>
+              </td>
+              <td>{{item.size}}</td>
+              <td>{{item.mtime}}</td>
+            </tr>
+            </tbody>
+          </table>
         </div>
-      </Content>
-    </Layout>
-  </Layout>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -128,18 +126,25 @@
         clipboard: [],
         clipboard_method: '',
         checkAll: false,
+        isCheckAll: false,
         indeterminate: false,
         new_folder_name: '',
         modalFlag: false,
         searchKey: '',
         downloadLink: '',
         new_file_name: '',
+        checkedFiles: []
       }
     },
     computed: {
       ...mapState(['globals', 'websocket'])
     },
     components: { VFileSelect },
+    watch: {
+      isCheckAll(val) {
+        this.checkedFiles = val ? this.current_folders.map(item => item.path) : []
+      }
+    },
     methods: {
       ...mapMutations(['initWS']),
       async getPathData(path, func, only_folder = false, orderby = 'name', order = 'asc') {
@@ -175,16 +180,15 @@
         func(Data);
       },
       resetCheckGroup() {
-        this.checkAll = false;
-        this.checkGroup = [];
-        this.indeterminate = false;
+        this.isCheckAll = false
+        this.checkedFiles = []
       },
       setCurrentFolder(data) {
-        this.current_folders = data;
-        this.resetCheckGroup();
+        this.current_folders = data
+        this.resetCheckGroup()
       },
       setBreadPath(path) {
-        this.bread_item = path.split("/");
+        this.bread_item = path.split('/');
         this.bread_item.splice(0, 1);
       },
       openDir(item) {
@@ -194,7 +198,7 @@
         this.setBreadPath(item.path)
       },
       clickBreadItem(index) {
-        var path = "/";
+        var path = '/';
         var tmp = this.bread_item;
         while (tmp.length > index + 1) {
           tmp.pop();
@@ -214,48 +218,18 @@
       loadData(item, callback) {
         this.getPathData(item.path, callback, true);
       },
-      handleCheckAll() {
-        if (this.indeterminate) {
-          this.checkAll = false;
-        } else {
-          this.checkAll = !this.checkAll;
-        }
-        this.indeterminate = false;
-
-        if (this.checkAll) {
-          var tmp = [];
-          for (var i = 0; i < this.current_folders.length; i++) {
-            tmp.push(this.current_folders[i].path)
-          }
-          this.checkGroup = tmp;
-        } else {
-          this.checkGroup = [];
-        }
-      },
       fileSort(name) {
         let names = name.split('-');
         let cur_dir = "/" + this.bread_item.join('/');
         this.getPathData(cur_dir, this.setCurrentFolder, false, names[0], names[1]);
       },
-      checkAllGroupChange(data) {
-        if (data.length === this.current_folders.length) {
-          this.indeterminate = false;
-          this.checkAll = true;
-        } else if (data.length > 0) {
-          this.indeterminate = true;
-          this.checkAll = false;
-        } else {
-          this.indeterminate = false;
-          this.checkAll = false;
-        }
-      },
       addItemToClipboard(method) {
-        if (this.checkGroup.length === 0) {
+        if (this.checkedFiles.length === 0) {
           this.$Message.warning('请至少选择一个文件或者文件夹')
           return false
         }
 
-        this.clipboard = this.checkGroup.slice()
+        this.clipboard = this.checkedFiles.slice()
         this.clipboard_method = method
         const msg = method === 'copy' ? '复制' : '剪切'
         if (method !== '' && method !== 'remove') {
@@ -302,20 +276,12 @@
           }
         })
       },
-      pressBackKey(e) {
-        if (e.keyCode === 8) {
-          this.globals.press_back_key = true
-        }
-      },
-      modelVisible(v) {
-        v ? window.addEventListener('keydown', this.pressBackKey) : window.removeEventListener('keydown', this.pressBackKey)
-      },
       async confirmUpload() {
         const curDir = `/${this.bread_item.join('/')}`
         this.globals.pending_upload_data.push(curDir)
         const fileSelect = this.$refs.fileSelect
 
-        if (fileSelect.checkGroup.length === 0) {
+        if (fileSelect.checkedFiles.length === 0) {
           this.$Message.error('请至少选择一个文件')
           return
         }
@@ -326,7 +292,7 @@
 
         this.websocket.send(JSON.stringify({
           type: 3,
-          paths: fileSelect.checkGroup,
+          paths: fileSelect.checkedFiles,
           tpath: curDir
         }))
         this.$Message.success('已经添加到上传队列!')
@@ -416,43 +382,36 @@
       },
       renameFunc(name) {
         this.$Modal.confirm({
-            render: (h) => {
-                return h('Input', {
-                    props: {
-                        value: name,
-                        autofocus: true,
-                    },
-                    on: {
-                        input: (val) => {
-                            this.new_file_name = val;
-                        }
-                    }
-                })
-            },
-            loading: true,
-            okText: '确认',
-            cancelText: '取消',
-            onOk: async () => {
-                const cur_dir = `/${this.bread_item.join('/')}`
-                const old_name = `${cur_dir}/${name}`
-                const new_name = `${cur_dir}/${this.new_file_name}`
-                const result = await $axios.get(`file_operation?method=move&paths=${encodeURIComponent(old_name + '|' + new_name)}`)
-                this.$Modal.remove()
-                this.new_folder_name = ''
-                if (result.data.code !== 0) {
-                    this.$Message.error(result.data.msg)
-                } else {
-                    this.getPathData(cur_dir, this.setCurrentFolder)
+          render: (h) => {
+            return h('Input', {
+              props: {
+                value: name,
+                autofocus: true,
+              },
+              on: {
+                input: (val) => {
+                  this.new_file_name = val;
                 }
+              }
+            })
+          },
+          loading: true,
+          okText: '确认',
+          cancelText: '取消',
+          onOk: async () => {
+            const cur_dir = `/${this.bread_item.join('/')}`
+            const old_name = `${cur_dir}/${name}`
+            const new_name = `${cur_dir}/${this.new_file_name}`
+            const result = await $axios.get(`file_operation?method=move&paths=${encodeURIComponent(old_name + '|' + new_name)}`)
+            this.$Modal.remove()
+            this.new_folder_name = ''
+            if (result.data.code !== 0) {
+              this.$Message.error(result.data.msg)
+            } else {
+              this.getPathData(cur_dir, this.setCurrentFolder)
             }
+          }
         });
-      },
-      changeViewMode() {
-        if (this.files_view_mode === 1) {
-          this.files_view_mode = 2;
-        } else {
-          this.files_view_mode = 1;
-        }
       },
       async searchKeyword() {
         if (this.searchKey === '') {
@@ -480,10 +439,6 @@
           })
         }
         this.setCurrentFolder(Data)
-      },
-      jumpToFolder(folder) {
-        this.getPathData(folder, this.setCurrentFolder)
-        this.setBreadPath(folder)
       },
       offlineDownload() {
         this.$Modal.confirm({
@@ -564,64 +519,3 @@
     }
   }
 </script>
-
-<style scoped>
-  .ivu-layout-content {
-    position: relative;
-    padding: 24px;
-    overflow: hidden;
-    min-height: 280px;
-    background: white;
-  }
-
-  .icons-item {
-    display: inline-block;
-    vertical-align: top;
-    margin: 6px 6px 6px 0;
-    width: 150px;
-    text-align: center;
-    list-style: none;
-    height: 125px;
-    color: #5c6b77;
-    transition: all .2s ease;
-    position: relative;
-    padding-top: 10px;
-    cursor: pointer;
-  }
-
-  .icons-item p {
-    transition: color .2s;
-  }
-
-  .icons-item:hover p {
-    color: #2d8cf0;
-  }
-
-  .file_list {
-    padding-top: 12px;
-  }
-
-  .file_list:hover {
-    box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
-    border-color: #eee;
-  }
-
-  .ivu-col-dirname {
-    cursor: pointer;
-    transition: color .2s;
-  }
-
-  .ivu-col-dirname:hover {
-    color: #2d8cf0;
-  }
-
-  .ivu-col-dirname .ivu-col-rename-btn,
-  .ivu-col-filename .ivu-col-rename-btn {
-    display: none;
-  }
-
-  .ivu-col-dirname:hover .ivu-col-rename-btn,
-  .ivu-col-filename:hover .ivu-col-rename-btn {
-    display: inline-block;
-  }
-</style>

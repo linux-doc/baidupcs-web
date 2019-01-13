@@ -1,0 +1,111 @@
+.page-file-manager {
+  display: flex;
+  height: calc(100vh - 60px);
+
+  .ivu-layout-sider {
+    background-color: #f5f7f9;
+  }
+
+  .p-main {
+    flex: auto;
+  }
+
+  .ivu-breadcrumb {
+    margin: 8px 0 0;
+    padding-left: 16px;
+  }
+
+  .p-content {
+    position: relative;
+    padding: 16px;
+
+    .row-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+
+      .t-l {
+        display: flex;
+        align-items: center;
+
+        .v-checkbox {
+          margin-left: 2px;
+          margin-right: 16px;
+        }
+      }
+    }
+  }
+
+  .table-wrap {
+    max-height: calc(100vh - 163px);
+    overflow-y: auto;
+  }
+
+  .files-table {
+    width: 100%;
+    border-spacing: 0;
+
+    thead {
+      tr {
+        height: 36px;
+
+        th {
+          text-align: left;
+          border-bottom: 1px solid #f2f6fd;
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        height: 42px;
+
+        &:hover {
+          background-color: #f6faff;
+        }
+      }
+    }
+
+    .item-title {
+      display: flex;
+      align-items: center;
+      overflow-x: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
+      .t-content {
+        display: flex;
+        align-items: center;
+
+        > span {
+          margin-left: 8px;
+        }
+      }
+
+      .t-buttons {
+        display: none;
+      }
+
+      &.is-dir {
+        .t-content {
+          cursor: pointer;
+        }
+
+        &:hover {
+          .t-content {
+            > span {
+              color: #2d8cf0;
+            }
+          }
+        }
+      }
+
+      &:hover {
+        .t-buttons {
+          display: block;
+        }
+      }
+    }
+  }
+}

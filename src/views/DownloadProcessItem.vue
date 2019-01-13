@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="child-download-items">
     <Modal v-model="modalDetailFlag" draggable title="任务详情" :width="800">
       <Row>
         <Col span="4"><p style="font-size: 14px">任务ID</p></Col>
@@ -20,47 +20,50 @@
       </div>
     </Modal>
 
-    <Card :bordered="false" v-for="item of items">
-      <p slot="title">{{item.name}}
-        <Divider type="vertical"/>
-        <span v-if="istatus === 1">
+    <div class="items-list">
+      <div class="item" v-for="item of items">
+        <h3 class="i-title">
+          <span>{{item.name}}</span>
+          <span v-if="istatus === 1">
           <template v-if="itype === 1">等待下载...</template>
           <template v-if="itype === 2">等待上传...</template>
         </span>
-        <span v-else>{{item.total_size}}</span>
-      </p>
-      <Row v-if="istatus !== 3">
-        <Col span="11">
-          <Progress :percent="item.percent" status="active"/>
-        </Col>
-        <Col class="c-action-group" span="3" v-if="itype === 1 && istatus === 2">
-          <Button size="small" type="success" ghost v-if="item.is_pause"
-                  @click="switchDownloadStatus(item)">
-            <Icon type="md-play"></Icon>
-          </Button>
-          <Button size="small" type="warning" ghost v-else
-                  @click="switchDownloadStatus(item)">
-            <Icon type="md-pause"></Icon>
-          </Button>
-          <Button size="small" type="error" ghost @click="cancelTask(item)">
-            <Icon type="md-close"></Icon>
-          </Button>
-          <Button size="small" type="info" ghost @click="detailTask(item)">
-            <Icon type="md-barcode"></Icon>
-          </Button>
-        </Col>
-        <Col span="10">
-          <span>速度: {{item.speed}}/s</span>
-          <Divider type="vertical"/>
-          <span v-if="itype === 1">已经下载: {{item.download_size}}</span>
-          <span v-if="itype === 2">已经上传: {{item.uploaded_size}}</span>
-          <Divider type="vertical"/>
-          <span>已用时间: {{item.time_used}}</span>
-          <Divider type="vertical"/>
-          <span>预计还需: {{item.time_left}}</span>
-        </Col>
-      </Row>
-    </Card>
+          <span v-else>{{item.total_size}}</span>
+        </h3>
+
+        <div class="i-body">
+          <!--进度条-->
+          <div class="b-progress">
+            <Progress :percent="item.percent" status="active"/>
+          </div>
+          <!--操作按钮-->
+          <div class="b-actions" v-if="itype === 1 && istatus === 2">
+            <Button size="small" type="success" ghost v-if="item.is_pause"
+                    @click="switchDownloadStatus(item)">
+              <Icon type="md-play"></Icon>
+            </Button>
+            <Button size="small" type="warning" ghost v-else
+                    @click="switchDownloadStatus(item)">
+              <Icon type="md-pause"></Icon>
+            </Button>
+            <Button size="small" type="error" ghost @click="cancelTask(item)">
+              <Icon type="md-close"></Icon>
+            </Button>
+            <Button size="small" type="info" ghost @click="detailTask(item)">
+              <Icon type="md-barcode"></Icon>
+            </Button>
+          </div>
+          <!--统计信息-->
+          <div class="b-info">
+            <span>速度: {{item.speed}}/s</span>
+            <span v-if="itype === 1">已经下载: {{item.download_size}}</span>
+            <span v-if="itype === 2">已经上传: {{item.uploaded_size}}</span>
+            <span>已用时间: {{item.time_used}}</span>
+            <span>预计还需: {{item.time_left}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
