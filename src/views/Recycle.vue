@@ -1,23 +1,40 @@
 <template>
-  <div style="height: 60vh; overflow: auto; margin-top: 30px">
-    <Row>
-      <Col span="8">文件名</Col>
-      <Col span="2">文件大小</Col>
-      <Col span="8">文件路径</Col>
-      <Col span="2">剩余时间</Col>
-      <Col span="2">还原</Col>
-      <Col span="2">删除</Col>
-    </Row>
-    <Row class="file_list" style="margin-top: 8px; line-height: 30px;" v-for="item of recycleData">
-      <Col :title="item.name" span="8" style="overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;">
-        {{item.name}}
-      </Col>
-      <Col span="2">{{item.size}}</Col>
-      <Col span="8" :title="item.path" style="overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;">{{item.path}}</Col>
-      <Col span="2">{{item.leftTime}}</Col>
-      <Col span="2"><Button icon="md-undo" type="info" ghost @click="restoreRecycle(item.fid)"></Button></Col>
-      <Col span="2"><Button icon="md-close" type="error" ghost @click="deleteRecycle(item.fid)"></Button></Col>
-    </Row>
+  <div class="page-recycle">
+    <table class="table">
+      <colgroup>
+        <col style="width: 30%;">
+        <col style="width: 10%;">
+        <col style="width: 30%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+      </colgroup>
+      <thead>
+      <tr>
+        <th>文件名</th>
+        <th>文件大小</th>
+        <th>文件路径</th>
+        <th>剩余时间</th>
+        <th>还原</th>
+        <th>删除</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr v-for="item of recycleData">
+        <td><div class="col-long" :title="item.name">{{item.name}}</div></td>
+        <td>{{item.size}}</td>
+        <td><div class="col-long" :title="item.path">{{item.path}}</div></td>
+        <td>{{item.leftTime}}</td>
+        <td>
+          <Button icon="md-undo" type="info" ghost @click="restoreRecycle(item.fid)"></Button>
+        </td>
+        <td>
+          <Button icon="md-close" type="error" ghost @click="deleteRecycle(item.fid)"></Button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -88,9 +105,3 @@
     }
   }
 </script>
-
-<style scoped>
-  .ivu-btn {
-    padding: 0 3px 0 3px;
-  }
-</style>
