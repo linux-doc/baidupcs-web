@@ -1,6 +1,6 @@
 <template>
-  <Layout>
-    <Sider hide-trigger :style="{background: '#fff'}">
+  <div class="page-download">
+    <Sider hide-trigger>
       <Menu theme="light" width="auto" :open-names="['1']" :active-name="select_menu_name" @on-select="getMenuName">
         <Submenu name="1">
           <template slot="title"><Icon type="ios-cloud-download"></Icon>我的下载</template>
@@ -19,7 +19,7 @@
         </Submenu>
       </Menu>
     </Sider>
-    <Layout :style="{padding: '24px'}">
+    <div class="p-main">
       <div style="margin-bottom: 8px;" v-if="select_menu_name === '1-1' && (globals.downloading.length || globals.pending_download.length)">
         <Button size="small" type="error" ghost @click="cancelAll">全部取消</Button>
       </div>
@@ -91,8 +91,8 @@
           </Row>
         </Card>
       </div>
-    </Layout>
-  </Layout>
+    </div>
+  </div>
 </template>
 
 <script>
