@@ -20,10 +20,6 @@
         <Spin size="large" fix v-if="spin_show"></Spin>
         <div class="row-tools">
           <div class="t-l">
-            <!--<Button @click="changeViewMode" type="text">
-              <Icon type="md-reorder" size="24" v-if="files_view_mode === 1"></Icon>
-              <Icon type="md-apps" size="24" v-if="files_view_mode === 2"></Icon>
-            </Button>-->
             <label class="v-checkbox"><input type="checkbox" v-model="isCheckAll"><span></span></label>
             <Dropdown @on-click="fileSort" style="margin-right: 16px;">
               <Icon type="md-swap" size="24" style="cursor: pointer"></Icon>
@@ -99,16 +95,6 @@
             </tbody>
           </table>
         </div>
-
-
-        <!--<Checkbox :indeterminate="indeterminate" :value="checkAll" @click.prevent.native="handleCheckAll">全选</Checkbox>-->
-        <!--<Card v-show="files_view_mode === 1" :bordered="false" class="icons-item"
-              @click.native="openDir(item)" v-for="(item, i) of current_folders" :key="i">
-          <Checkbox :label="item.path" style="position: absolute; top: 0; left: 0;"><span></span></Checkbox>
-          <Icon type="ios-folder-outline" size="32" v-if="item.isdir"/>
-          <Icon type="ios-document" size="32" v-if="!item.isdir"/>
-          <p :title="item.title" style="overflow: hidden;">{{item.title}}</p>
-        </Card>-->
       </div>
     </div>
   </div>
