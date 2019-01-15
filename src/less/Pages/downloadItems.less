@@ -47,3 +47,40 @@
     }
   }
 }
+
+.v-progress {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+
+  .p-bar {
+    position: relative;
+    flex: 1;
+    background-color: #f3f3f3;
+    border-radius: 10px;
+    margin-right: 8px;
+
+    .b-fg {
+      height: 10px;
+      background-color: #2d8cf0;
+      border-radius: 10px;
+      transition: width .2s linear;
+    }
+  }
+
+  .p-text {
+    width: 48px;
+  }
+
+  &.success {
+    .p-bar {
+      .b-fg {
+        background-color: #19be6b;
+      }
+    }
+
+    .p-text {
+      color: #19be6b;
+    }
+  }
+}
