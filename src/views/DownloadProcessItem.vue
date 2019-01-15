@@ -34,24 +34,19 @@
         <div class="i-body">
           <!--进度条-->
           <div class="b-progress">
-            <Progress :percent="item.percent" status="active"/>
+            <div class="v-progress" :class="{success: item.percent >= 100}">
+              <div class="p-bar">
+                <div class="b-fg" :style="`width: ${item.percent}%;`"></div>
+              </div>
+              <div class="p-text">{{item.percent}}%</div>
+            </div>
           </div>
           <!--操作按钮-->
           <div class="b-actions" v-if="itype === 1 && istatus === 2">
-            <Button size="small" type="success" ghost v-if="item.is_pause"
-                    @click="switchDownloadStatus(item)">
-              <Icon type="md-play"></Icon>
-            </Button>
-            <Button size="small" type="warning" ghost v-else
-                    @click="switchDownloadStatus(item)">
-              <Icon type="md-pause"></Icon>
-            </Button>
-            <Button size="small" type="error" ghost @click="cancelTask(item)">
-              <Icon type="md-close"></Icon>
-            </Button>
-            <Button size="small" type="info" ghost @click="detailTask(item)">
-              <Icon type="md-barcode"></Icon>
-            </Button>
+            <button type="button" class="ivu-btn ivu-btn-warning ivu-btn-small ivu-btn-ghost" v-if="item.is_pause" @click="switchDownloadStatus(item)"><Icon type="md-play"></Icon></button>
+            <button type="button" class="ivu-btn ivu-btn-warning ivu-btn-small ivu-btn-ghost" v-else @click="switchDownloadStatus(item)"><Icon type="md-pause"></Icon></button>
+            <button type="button" class="ivu-btn ivu-btn-error ivu-btn-small ivu-btn-ghost" @click="cancelTask(item)"><Icon type="md-close"></Icon></button>
+            <button type="button" class="ivu-btn ivu-btn-info ivu-btn-small ivu-btn-ghost" @click="detailTask(item)"><Icon type="md-barcode"></Icon></button>
           </div>
           <!--统计信息-->
           <div class="b-info">
@@ -72,15 +67,15 @@
 
   export default {
     name: 'v-download-process-item',
-    //itype:   1 下载   2 上传
-    //istatus: 1 等待   2 进行中   3 完成
-    props: ['items', 'itype', 'istatus'],
     data() {
       return {
         modalDetailFlag: false,
-        taskDetail: [],
+        taskDetail: []
       }
     },
+    //itype:   1 下载   2 上传
+    //istatus: 1 等待   2 进行中   3 完成
+    props: ['items', 'itype', 'istatus'],
     methods: {
       async switchDownloadStatus(item) {
         const method = item.is_pause ? 'resume' : 'pause'
