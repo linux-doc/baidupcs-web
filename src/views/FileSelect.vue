@@ -5,7 +5,7 @@
       <span slot="prepend">目录路径</span>
       <span slot="append" style="cursor: pointer;" @click="backToParent">上级目录</span>
     </Input>
-    <div class="file-list" style="margin-top: 10px;">
+    <div class="file-list" style="margin-top: 10px; overflow-y: auto; max-height: 64vh;">
       <div class="l-row" style="display: flex;align-items: center;height: 36px;">
         <div class="r-col ivu-col-span-1" style="width: calc(1/24*100%);">
           <label class="v-checkbox"><input type="checkbox" v-model="isCheckAll"><span></span></label>
