@@ -147,8 +147,19 @@
     },
     methods: {
       ...mapMutations(['initWS']),
-      async getPathData(path, func, only_folder = false, orderby = 'name', order = 'asc') {
+      async getPathData(path, func, only_folder = false, orderby = 'none', order = 'none') {
         this.spin_show = true
+        if (localStorage['baidupcs_file_sort'] == null) {
+            if (orderby === 'none') {
+                orderby = 'name'
+                order = 'asc'
+            }
+        } else {
+            let names = localStorage['baidupcs_file_sort'].split('-');
+            orderby = names[0]
+            order = names[1]
+        }
+
         const Data = []
         const result = await $axios.get(`files?path=${encodeURIComponent(path)}&order_by=${orderby}&order=${order}`).catch(this.error)
         this.spin_show = false;
@@ -219,6 +230,7 @@
         this.getPathData(item.path, callback, true);
       },
       fileSort(name) {
+        localStorage.setItem('baidupcs_file_sort', name)
         let names = name.split('-');
         let cur_dir = "/" + this.bread_item.join('/');
         this.getPathData(cur_dir, this.setCurrentFolder, false, names[0], names[1]);
@@ -470,7 +482,16 @@
       async getFiles() {
         this.spin_show = true
         const Data = [], Data1 = []
-        const result = await $axios.get('files?path=/').catch(this.error)
+        let orderby = '', order = ''
+        if (localStorage['baidupcs_file_sort'] == null) {
+            orderby = 'name'
+            order = 'asc'
+        } else {
+            let names = localStorage['baidupcs_file_sort'].split('-');
+            orderby = names[0]
+            order = names[1]
+        }
+        const result = await $axios.get(`files?path=/&order_by=${orderby}&order=${order}`).catch(this.error)
         this.spin_show = false
 
         const data = result.data
