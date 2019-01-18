@@ -26,6 +26,9 @@
 
 ```./BaiduPCS-Go-xxx web --port 12345```
 
+### 目前百度是针对账号进行限速，当一个非会员账号下载量达到一定阈值就会触发限速。账号被限速之后容易出现下载错误、掉连接数等问题，需要过几天或者开通会员才会恢复"
+代码: 31326, 消息: user is not authorized, hitcode:123
+
 ### 对于老版登陆后没有内容, 只显示 "No permission to do this operation"
 登陆后在右上角的设置里面把appid设置为```266719```就可以正常使用了
 ![avatar](http://oozw0y5q9.bkt.clouddn.com/20180918142033.png)
