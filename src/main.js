@@ -7,7 +7,12 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import config from './config'
-import './registerServiceWorker'
+// import './registerServiceWorker'
+
+
+if (/Mobi/i.test(navigator.userAgent)) {
+    location.href = `${location.origin}/dist_mobile`
+}
 
 Vue.use(iView)
 Vue.config.productionTip = false
