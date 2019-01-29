@@ -479,7 +479,7 @@
           }
         })
       },
-      async getFiles() {
+      async getFiles(path) {
         this.spin_show = true
         const Data = [], Data1 = []
         let orderby = '', order = ''
@@ -491,7 +491,7 @@
             orderby = names[0]
             order = names[1]
         }
-        const result = await $axios.get(`files?path=/&order_by=${orderby}&order=${order}`).catch(this.error)
+        const result = await $axios.get(`files?path=${encodeURIComponent(path)}&order_by=${orderby}&order=${order}`).catch(this.error)
         this.spin_show = false
 
         const data = result.data
@@ -533,10 +533,30 @@
         }
         this.folders[0].children = Data1
         this.current_folders = Data
-      }
+      },
+      async getWorkingDir() {
+        const result = await $axios.get(`setting?method=get`).catch(this.error)
+        let ret = ''
+        if (result.data.code !== 0) {
+          this.error(result.data.msg)
+          return ret
+        }
+        const data = result.data.data
+        for(let i = 0; i < data.length; i++) {
+          if(data[i].en_name === 'workdir') {
+            ret = data[i].value
+          }
+        }
+        return ret
+      },
     },
-    mounted() {
-      this.getFiles()
+    async mounted() {
+      let path = await this.getWorkingDir()
+
+      if (path !== '') {
+        this.setBreadPath(path)
+        this.getFiles(path)
+      }
     }
   }
 </script>
