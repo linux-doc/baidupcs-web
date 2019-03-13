@@ -24,7 +24,7 @@
               <Badge dot v-if="updateFlag">更新</Badge>
               <span v-else>更新</span>
             </MenuItem>
-            <MenuItem name="lock" @click.native="startSetLockPwd">设置锁定密码</MenuItem>
+            <!--<MenuItem name="lock" @click.native="startSetLockPwd">设置锁定密码</MenuItem>-->
             <MenuItem name="switch" @click.native="switchUser">切换账号</MenuItem>
             <MenuItem name="logout" @click.native="logout">退出</MenuItem>
           </Submenu>

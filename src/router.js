@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Login from './views/Login'
 import Nav from './components/Nav'
-import Lock from './views/Lock.vue'
+// import Lock from './views/Lock.vue'
 import store from './store'
 
 Vue.use(Router)
@@ -21,7 +21,7 @@ const router = new Router({
       meta: { auth: true }
     },
     { path: '/login', component: Login },
-    { path: '/lock', component: Lock },
+    // { path: '/lock', component: Lock },
     {
       path: '/download',
       components: {
@@ -39,10 +39,10 @@ router.beforeEach((to, from, next) => {
       next('/login')
       return
     }
-    if (store.state.isLock) {
+    /*if (store.state.isLock) {
       next('/lock')
       return
-    }
+    }*/
   }
   next()
 })
