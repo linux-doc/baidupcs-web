@@ -215,14 +215,14 @@ export default new Vuex.Store({
         user = body.data.data
         login = true
 
-        const hasLockPwd = await $axios.get('password?method=exist')
+        /*const hasLockPwd = await $axios.get('password?method=exist')
         if (hasLockPwd.status === 200 && hasLockPwd.data && hasLockPwd.data.code === 0) {
           if (hasLockPwd.data.data) {
             if (localStorage.lastUnlockTime === undefined || (new Date().getTime() - Number(localStorage.lastUnlockTime) > 86400 * 1000)) {
               commit('setIsLock', true)
             }
           }
-        }
+        }*/
       } else {
         user = {}
       }

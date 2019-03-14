@@ -147,7 +147,7 @@
               break;
             case 7: //登录成功
               location.href = '/dist'
-              localStorage.lastUnlockTime = new Date().getTime()
+              // localStorage.lastUnlockTime = new Date().getTime()
               break;
           }
         }
