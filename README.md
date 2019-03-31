@@ -2,6 +2,9 @@
 
 这个项目基于BaiduPCS-Go, 可以让你高效的使用百度云
 
+#### 在公众号上用心写了一篇介绍，让大家更好地了解和使用BaiduPCS-Go Web版
+https://w.url.cn/s/AdjX09Y
+
 ![avatar](https://user-images.githubusercontent.com/8407297/44954655-ba346e00-aed7-11e8-835d-59014e155aa7.png)
 ![avatar](https://user-images.githubusercontent.com/8407297/44954613-19de4980-aed7-11e8-963e-6366025bd9d7.png)
 ![avatar](https://user-images.githubusercontent.com/8407297/44954618-2e224680-aed7-11e8-8413-3a092f8ef9b6.png)
