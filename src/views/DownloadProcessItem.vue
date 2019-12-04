@@ -43,10 +43,10 @@
           </div>
           <!--操作按钮-->
           <div class="b-actions" v-if="itype === 1 && istatus === 2">
-            <button type="button" class="ivu-btn ivu-btn-warning ivu-btn-small ivu-btn-ghost" v-if="item.is_pause" @click="switchDownloadStatus(item)"><Icon type="md-play"></Icon></button>
-            <button type="button" class="ivu-btn ivu-btn-warning ivu-btn-small ivu-btn-ghost" v-else @click="switchDownloadStatus(item)"><Icon type="md-pause"></Icon></button>
+<!--            <button type="button" class="ivu-btn ivu-btn-warning ivu-btn-small ivu-btn-ghost" v-if="item.is_pause" @click="switchDownloadStatus(item)"><Icon type="md-play"></Icon></button>-->
+<!--            <button type="button" class="ivu-btn ivu-btn-warning ivu-btn-small ivu-btn-ghost" v-else @click="switchDownloadStatus(item)"><Icon type="md-pause"></Icon></button>-->
             <button type="button" class="ivu-btn ivu-btn-error ivu-btn-small ivu-btn-ghost" @click="cancelTask(item)"><Icon type="md-close"></Icon></button>
-            <button type="button" class="ivu-btn ivu-btn-info ivu-btn-small ivu-btn-ghost" @click="detailTask(item)"><Icon type="md-barcode"></Icon></button>
+<!--            <button type="button" class="ivu-btn ivu-btn-info ivu-btn-small ivu-btn-ghost" @click="detailTask(item)"><Icon type="md-barcode"></Icon></button>-->
           </div>
           <!--统计信息-->
           <div class="b-info">

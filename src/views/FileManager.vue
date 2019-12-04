@@ -35,7 +35,7 @@
 
             <Input v-model="searchKey" @on-search="searchKeyword" suffix="ios-search" search clearable
                    placeholder="在当前文件夹下搜索..." style="width: auto"/>
-            <Button style="margin-left: 8px" @click="offlineDownload"><Icon type="md-link"></Icon>离线下载</Button>
+<!--            <Button style="margin-left: 8px" @click="offlineDownload"><Icon type="md-link"></Icon>离线下载</Button>-->
           </div>
 
           <div class="t-r">
