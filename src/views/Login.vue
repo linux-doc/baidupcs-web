@@ -192,12 +192,36 @@
         }
       },
       async loginWithBDUSS() {
-        if (this.BDUSS === '') return
-
+        if (this.BDUSS === '') {
+          this.button_loading = false;
+          this.$Message.error({
+                content: '请输入BDUSS...',
+                duration: 10,
+                closable: true
+              });
+          return
+          }
         const body = await $axios.get(`login?bduss=${this.BDUSS}`).catch(this.error)
-        if (body === undefined) return
+        if (body === undefined) {
+          this.button_loading = false;
+          this.$Message.error({
+                content: '请检查网络连接...',
+                duration: 10,
+                closable: true
+              });
+          return
+        }
         if (body.data.code === 0) {
           location.href = '/dist'
+        }else
+        {
+          this.button_loading = false;
+          this.$Message.error({
+                content: body.data.msg,
+                duration: 10,
+                closable: true
+              });
+          return
         }
       }
     },
