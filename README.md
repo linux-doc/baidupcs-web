@@ -10,7 +10,7 @@
 6. 版本更新到3.7.1，关闭消息通知和在线更新功能
 
 ## Aria2下载功能
-### 配置
+### 配置
 ```shell
 --aria2, -a                      启用aria2下载，停用自带下载
 --aria2url value, --au value     aria2的url (default: "http://localhost:6800/jsonrpc")
