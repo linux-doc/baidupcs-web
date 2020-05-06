@@ -42,3 +42,4 @@
 2. 不准备跟进iikira作者的更新，因为内核基本没变化，主要更新点都是下载引擎的，但我预备对接上Aria2然后放弃原下载引擎
 3. 前端仓库编译好后放在后端仓库的 /internal/pcsweb/dist ，再使用build.sh进行编译，需要的环境可以在 https://github.com/iikira/BaiduPCS-Go/wiki/编译-交叉编译帮助 获取
 4. 欢迎各位PR和提ISSUE
+5. 目前所有开发都在master分支(毕竟目前就我一个，人多了会考虑新分支)
