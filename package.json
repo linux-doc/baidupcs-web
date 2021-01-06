@@ -18,7 +18,7 @@
     "@vue/cli-plugin-eslint": "^3.12.1",
     "@vue/cli-plugin-pwa": "^3.12.1",
     "@vue/cli-service": "^3.12.1",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "iview": "^3.5.3",
     "less": "^3.10.3",
     "less-loader": "^4.1.0",
